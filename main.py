@@ -8,7 +8,7 @@ if sys.platform.startswith('win'):      # fix windows unicode error on CI
     sys.stdout.reconfigure(encoding='utf-8')
 
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import pathspec
 
@@ -42,6 +42,15 @@ class GitIgnoreMatcher:
         if path.is_dir() and spec.match_file(rel + "/"):
             return True
         return False
+    
+
+def max_items_int(v: str) -> int:
+    n = int(v)
+    if n < 1 or n > 10000:
+        raise argparse.ArgumentTypeError(
+            "--max-items must be >= 1 and <=10000 (or use --no-limit)"
+        )
+    return n
 
 
 def parse_args() -> argparse.Namespace:
@@ -52,6 +61,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--ignore", nargs="*", default=[])
     ap.add_argument("--gitignore-depth", type=int, default=None)
     ap.add_argument("--no-gitignore", action="store_true")
+    ap.add_argument("--max-items", type=max_items_int, default=20, help="Limit items shown per directory (default: 20). Use --no-limit for unlimited.")
+    ap.add_argument("--no-limit", action="store_true", help="Show all items regardless of count")
     return ap.parse_args()
 
 
@@ -78,7 +89,8 @@ def list_entries(
     spec: pathspec.PathSpec,
     show_all: bool,
     extra_ignores: List[str],
-) -> List[Path]:
+    max_items: Optional[int] = None,
+) -> Tuple[List[Path], int]:
     out: List[Path] = []
     for e in iter_dir(directory):
         if not show_all and e.name.startswith("."):
@@ -90,7 +102,14 @@ def list_entries(
         out.append(e)
 
     out.sort(key=lambda x: (x.is_file(), x.name.lower()))
-    return out
+
+    # Handle max_items limit
+    truncated = 0
+    if max_items is not None and len(out) > max_items:
+        truncated = len(out) - max_items
+        out = out[:max_items]
+
+    return out, truncated
 
 
 def draw_tree(
@@ -101,6 +120,7 @@ def draw_tree(
     extra_ignores: List[str],
     respect_gitignore: bool,
     gitignore_depth: Optional[int],
+    max_items: Optional[int] = None,
 ) -> None:
     gi = GitIgnoreMatcher(root, enabled=respect_gitignore, gitignore_depth=gitignore_depth)
 
@@ -126,23 +146,29 @@ def draw_tree(
 
         spec = pathspec.PathSpec.from_lines("gitwildmatch", patterns)
 
-        entries = list_entries(
+        entries, truncated = list_entries(
             dirpath,
             root=root,
             gi=gi,
             spec=spec,
             show_all=show_all,
             extra_ignores=extra_ignores,
+            max_items=max_items,
         )
 
         for i, entry in enumerate(entries):
-            is_last = i == len(entries) - 1
+            is_last = i == len(entries) - 1 and truncated == 0
             connector = LAST if is_last else BRANCH
             suffix = "/" if entry.is_dir() else ""
             print(prefix + connector + entry.name + suffix)
 
             if entry.is_dir():
                 rec(entry, prefix + (SPACE if is_last else VERT), depth + 1, patterns)
+
+        # Show truncation message if items were hidden
+        if truncated > 0:
+            # truncation line is always last among displayed items
+            print(prefix + LAST + f"... and {truncated} more items")
 
     if root.is_dir():
         rec(root, "", 0, [])
@@ -156,6 +182,9 @@ def main() -> None:
         print(f"Error: path not found: {root}", file=sys.stderr)
         raise SystemExit(1)
 
+    # If --no-limit is set, disable max_items
+    max_items = None if args.no_limit else args.max_items
+
     draw_tree(
         root=root,
         max_depth=args.max_depth,
@@ -163,6 +192,7 @@ def main() -> None:
         extra_ignores=args.ignore,
         respect_gitignore=not args.no_gitignore,
         gitignore_depth=args.gitignore_depth,
+        max_items=max_items,
     )
 
 
