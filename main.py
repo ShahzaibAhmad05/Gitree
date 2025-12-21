@@ -3,24 +3,25 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
-import sys, os
+import os
+import random
+import sys
+import zipfile
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+import pathspec
+
 if sys.platform.startswith('win'):      # fix windows unicode error on CI
     sys.stdout.reconfigure(encoding='utf-8')
 
-from util.helpers import GitIgnoreMatcher
-
-import zipfile
-import random
+from util.gitignore import GitIgnoreMatcher
 
 
 BRANCH = "├─ "
 LAST   = "└─ "
 VERT   = "│  "
 SPACE  = "   "
-
-
-
-    
 
 def max_items_int(v: str) -> int:
     n = int(v)
