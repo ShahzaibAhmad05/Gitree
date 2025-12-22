@@ -1,0 +1,200 @@
+name: auto_assign_issue
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  pull-requests: read
+  contents: read
+
+jobs:
+  assign:
+    if: github.event.issue.pull_request == null
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Assign commenter
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.issue.number;
+            const assignee = context.payload.comment.user.login;
+
+            const body = (context.payload.comment.body || '').toLowerCase();
+
+            // keyword check for auto-assigning
+            const hasAssignKeyword =
+              body.includes('assign me') ||
+              body.includes('assign it to me') ||
+              body.includes('assign this to me') ||
+              body.includes('assign this issue to me') ||
+              body.includes('assign the issue to me');
+
+            if (!hasAssignKeyword) {
+              core.info('No assign keyword found.');
+              return;
+            }
+
+            // 1) Don't reassign if already assigned
+            const current = context.payload.issue.assignees?.map(a => a.login) || [];
+            if (current.length > 0) {
+              core.info(`Already assigned to: ${current.join(', ')}`);
+              return;
+            }
+
+            // Helper: format issue as a single markdown link line (prevents duplicate link/title rendering)
+            function formatIssueLine(i) {
+              return `- [#${i.number} — ${i.title}](${i.url})`;
+            }
+
+            // Helper: suggest other unblocked issues
+            async function getSuggestions(limit = 5) {
+              // open issues, unassigned, not blocked
+              const q = `repo:${owner}/${repo} is:issue is:open no:assignee -label:blocked`;
+              const res = await github.rest.search.issuesAndPullRequests({ q, per_page: limit });
+              return (res.data.items || []).map(i => ({
+                number: i.number,
+                title: i.title,
+                url: i.html_url,
+              }));
+            }
+
+            // 2) Block if label "blocked" exists (and suggest alternatives)
+            const labels = (context.payload.issue.labels || [])
+              .map(l => (typeof l === 'string' ? l : l.name))
+              .filter(Boolean)
+              .map(l => l.toLowerCase());
+
+            if (labels.includes('blocked')) {
+              const suggestions = await getSuggestions(5);
+              const suggestionText = suggestions.length
+                ? suggestions.map(formatIssueLine).join('\n')
+                : '_No unblocked, unassigned issues found right now._';
+
+              await github.rest.issues.createComment({
+                owner, repo, issue_number,
+                body: [
+                  `⛔ Sorry @${assignee} — this issue is currently **blocked** and can’t be claimed yet.`,
+                  ``,
+                  `Here are some other **unblocked** issues you can pick up instead:`,
+                  suggestionText,
+                ].join('\n'),
+              });
+              return;
+            }
+
+            // 3) Capacity check:
+            // If the candidate has 2 assigned issues that do NOT have PRs, then do not assign a new issue.
+            //
+            // "Linked" here means: a PR cross-references the issue (GitHub timeline cross-reference),
+            // and the PR is authored by the candidate.
+            async function hasLinkedPRForIssue(issueNum) {
+              const query = `
+                query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issueOrPullRequest(number: $number) {
+                      __typename
+                      ... on Issue {
+                        timelineItems(last: 50, itemTypes: [CROSS_REFERENCED_EVENT]) {
+                          nodes {
+                            __typename
+                            ... on CrossReferencedEvent {
+                              source {
+                                __typename
+                                ... on PullRequest {
+                                  number
+                                  url
+                                  state
+                                  isDraft
+                                  author { login }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+
+              const data = await github.graphql(query, {
+                owner,
+                repo,
+                number: issueNum,
+              });
+
+              const iop = data?.repository?.issueOrPullRequest;
+              if (!iop || iop.__typename !== 'Issue') return false;
+
+              const nodes = iop.timelineItems?.nodes || [];
+              for (const n of nodes) {
+                if (n?.__typename !== 'CrossReferencedEvent') continue;
+                const pr = n?.source;
+                if (pr?.__typename !== 'PullRequest') continue;
+
+                if ((pr?.author?.login || '').toLowerCase() === assignee.toLowerCase()) {
+                  // Counts any PR state (OPEN/MERGED/CLOSED) as "has a PR for it".
+                  // If you want ONLY open PRs, add: && pr.state === "OPEN"
+                  return true;
+                }
+              }
+              return false;
+            }
+
+            async function getOpenAssignedIssuesForUser() {
+              // Find open issues assigned to this user in this repo
+              const q = `repo:${owner}/${repo} is:issue is:open assignee:${assignee}`;
+              const res = await github.rest.search.issuesAndPullRequests({ q, per_page: 20 });
+              return (res.data.items || []).map(i => ({
+                number: i.number,
+                title: i.title,
+                url: i.html_url,
+              }));
+            }
+
+            const assignedIssues = await getOpenAssignedIssuesForUser();
+
+            // Count assigned issues that do NOT have PRs by this assignee
+            const issuesWithoutPR = [];
+            for (const it of assignedIssues) {
+              const hasPR = await hasLinkedPRForIssue(it.number);
+              if (!hasPR) issuesWithoutPR.push(it);
+              if (issuesWithoutPR.length >= 2) break; // early exit
+            }
+
+            if (issuesWithoutPR.length >= 2) {
+              const noPRText = issuesWithoutPR
+                .slice(0, 10)
+                .map(formatIssueLine)
+                .join('\n');
+
+              await github.rest.issues.createComment({
+                owner, repo, issue_number,
+                body: [
+                  `⛔ Sorry @${assignee} — you already have **2 or more** assigned issues with **no pull request(s)**.`,
+                  ``,
+                  `Please open a PR for one of your assigned issues before claiming a new one:`,
+                  noPRText || '_Could not list the issues (unexpected)._',
+                  ``,
+                  `Tip: opening a **draft PR** is fine—once a PR is linked, you'll be able to claim another issue.`,
+                ].join('\n'),
+              });
+
+              return;
+            }
+
+            // 4) Assign
+            await github.rest.issues.addAssignees({
+              owner, repo, issue_number,
+              assignees: [assignee],
+            });
+
+            await github.rest.issues.createComment({
+              owner, repo, issue_number,
+              body: `🎉 Thank you for your interest in contributing!\n\nThe issue has been assigned to @${assignee}. Happy coding!`,
+            });
