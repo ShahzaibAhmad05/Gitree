@@ -1,6 +1,6 @@
 import argparse
 import os
-from utilities.utils import max_items_int, get_unused_file_path
+from ..utilities.utils import max_items_int, get_unused_file_path
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Print a directory tree (respects .gitignore).")

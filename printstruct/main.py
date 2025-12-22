@@ -1,14 +1,14 @@
 # main.py
 from __future__ import annotations
-import sys, os, io, pyperclip
+import sys, io, pyperclip
 if sys.platform.startswith('win'):      # fix windows unicode error on CI
     sys.stdout.reconfigure(encoding='utf-8')
 
 from pathlib import Path
-from services.draw_tree import draw_tree
-from services.zip_project import zip_project
-from services.parser import parse_args
-from utilities.utils import get_project_version
+from .services.draw_tree import draw_tree
+from .services.zip_project import zip_project
+from .services.parser import parse_args
+from .utilities.utils import get_project_version
 
 
 def main() -> None:

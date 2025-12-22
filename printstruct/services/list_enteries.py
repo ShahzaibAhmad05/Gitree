@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 from pathlib import Path
-from utilities.gitignore import GitIgnoreMatcher
-from utilities.utils import iter_dir, matches_extra
+from ..utilities.gitignore import GitIgnoreMatcher
+from ..utilities.utils import iter_dir, matches_extra
 import pathspec
 
 
