@@ -322,7 +322,8 @@ def main() -> None:
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(output_buffer.getvalue())
 
-        print(f"Tree structure saved to: {filename}")
+        # TODO: Add to log instead of printing when log is implemented
+        # print(f"Tree structure saved to: {filename}")
     else:
         # Normal stdout output
         draw_tree(
