@@ -68,7 +68,7 @@ In addition to the directory path, the following options are available:
 |--------|-------------|
 | `--version`, `-v` | Displays the installed version. |
 | `--zip [name]` | Zips the project while respecting `.gitignore`. Example: `--zip a` creates `a.zip`. If no name is provided, a random ID is used. |
-| `--max-depth` | Limits recursion depth. Example: `--max-depth 1` shows only top-level files and folders. |
+| `--depth` | Limits recursion depth. Example: `--depth 1` shows only top-level files and folders. |
 | `--all`, `-a` | Includes hidden files and directories. Does not override `.gitignore`. |
 | `--ignore` | Adds extra files or directories to ignore. |
 | `--gitignore-depth` | Controls how deeply `.gitignore` files are discovered. Example: `--gitignore-depth 0` uses only the root `.gitignore`. |
