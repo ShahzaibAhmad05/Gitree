@@ -1,19 +1,19 @@
 # PrintStruct
 
-**PrintStruct** is a lightweight Python CLI that prints a directory tree of your project **while respecting `.gitignore`**, with optional zipping support.
+**PrintStruct** is a clean, lightweight Python CLI that prints a directory tree of your project **while respecting `.gitignore`**, with optional zipping support.
 
 The problems it solves:
 
 * sharing project structure in issues or pull requests
 * generating directory trees for documentation
-* pasting project layouts into ChatGPT or other LLMs
-* creating zip files for LLMs that follow `.gitignore` rules
+* pasting project layouts into LLMs
+* zipping projects for feeding to LLMs using `.gitignore` directions
 
 <br>
 
 ## Quick Start (10 seconds)
 
-### Installation using pip (recommended)
+### Installation using pip (recommended):
 
 Run this command in your terminal:
 
@@ -21,7 +21,7 @@ Run this command in your terminal:
 pip install printstruct
 ```
 
-### Usage
+### Usage:
 
 Open a terminal in any project and run:
 
@@ -54,7 +54,7 @@ PrintStruct
 └─ structure.py
 ```
 
-### Updating PrintStruct
+### Updating PrintStruct:
 
 To update the tool, reinstall it using pip. Pip will automatically replace the older version with the latest release.
 
