@@ -312,9 +312,11 @@ def main() -> None:
         # Copy to clipboard with error handling
         try:
             pyperclip.copy(tree_string)
-            print("✓ Tree copied to clipboard!", file=sys.stderr)
+            # TODO: add this later when logging feature is added
+            # print("✓ Tree copied to clipboard!", file=sys.stderr)
         except Exception as e:
-            print(f"Warning: Could not copy to clipboard: {e}", file=sys.stderr)
+            print(e)
+            # print(f"Warning: Could not copy to clipboard: {e}", file=sys.stderr)
     else:
         # Normal behavior - no clipboard
         draw_tree(
