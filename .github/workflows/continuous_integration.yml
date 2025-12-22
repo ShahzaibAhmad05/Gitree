@@ -14,7 +14,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Test run tool
-        run: python main.py
+
+      - name: Install package (editable)
+        run: pip install -e .
+
+      - name: Test CLI (prst)
+        run: prst .
+
+      - name: Test CLI (printstruct)
+        run: printstruct .
