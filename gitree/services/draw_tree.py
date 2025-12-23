@@ -16,6 +16,7 @@ def draw_tree(
     gitignore_depth: Optional[int],
     max_items: Optional[int] = None,
     ignore_depth: Optional[int] = None,
+    no_files: bool = False,
 ) -> None:
     gi = GitIgnoreMatcher(root, enabled=respect_gitignore, gitignore_depth=gitignore_depth)
 
@@ -50,6 +51,7 @@ def draw_tree(
             extra_ignores=extra_ignores,
             max_items=max_items,
             ignore_depth=ignore_depth,
+            no_files=no_files,
         )
 
         for i, entry in enumerate(entries):
