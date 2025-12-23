@@ -9,7 +9,56 @@ from .services.draw_tree import draw_tree, print_summary
 from .services.zip_project import zip_project
 from .services.parser import parse_args
 from .utilities.utils import get_project_version
+import subprocess
+import platform
 
+def copy_to_clipboard(text: str) -> bool:
+    """
+    Attempts to copy text to clipboard using multiple methods.
+    Returns True if successful, False otherwise.
+    """
+    # 1. Try pyperclip
+    try:
+        if pyperclip.is_available():
+            pyperclip.copy(text)
+            return True
+    except Exception:
+        pass
+
+    # 2. Try native OS commands as fallback
+    system = platform.system()
+    try:
+        if system == "Windows":
+            subprocess.run("clip", input=text.strip(), text=True, check=True, shell=True)
+            return True
+        elif system == "Darwin":  # macOS
+            subprocess.run("pbcopy", input=text, text=True, check=True)
+            return True
+        elif system == "Linux":
+            # Try wl-copy (Wayland)
+            try:
+                subprocess.run(["wl-copy"], input=text, text=True, check=True)
+                return True
+            except FileNotFoundError:
+                pass
+            
+            # Try xclip (X11)
+            try:
+                subprocess.run(["xclip", "-selection", "clipboard"], input=text, text=True, check=True)
+                return True
+            except FileNotFoundError:
+                pass
+            
+            # Try xsel (X11)
+            try:
+                subprocess.run(["xsel", "--clipboard", "--input"], input=text, text=True, check=True)
+                return True
+            except FileNotFoundError:
+                pass
+    except Exception:
+        pass
+
+    return False
 
 def main() -> None:
     args = parse_args()
@@ -23,11 +72,9 @@ def main() -> None:
         print(f"Error: path not found: {root}", file=sys.stderr)
         raise SystemExit(1)
 
+    # Initial check removed to allow fallback attempts later
     if args.copy and not pyperclip.is_available():
-        print("Could not find a copy mechanism for your system.")
-        print("If you are on Linux, you need to install 'xclip' (on X11) or 'wl-clipboard' (on Wayland).")
-        print("On other enviroments, you need to install qtpy or PyQt5 via pip.")
-        return
+        pass
         
     # If --no-limit is set, disable max_items
     max_items = None if args.no_limit else args.max_items
@@ -87,9 +134,12 @@ def main() -> None:
                 f.write(content)
 
         if args.copy:       # Capture output if needed for clipboard
-            pyperclip.copy(output_buffer.getvalue() + "\n")
+            content = output_buffer.getvalue() + "\n"
+            if not copy_to_clipboard(content):
+                print("Warning: Could not copy to clipboard. Please install a clipboard utility (xclip, wl-copy) or ensure your environment supports it.", file=sys.stderr)
+            else:
+                print("Output copied to clipboard!", file=sys.stderr)
 
 
 if __name__ == "__main__":
     main()
-
