@@ -69,6 +69,7 @@ def main() -> None:
             max_items=max_items,
             ignore_depth=args.ignore_depth,
             no_files=args.no_files,
+            emoji=args.emoji,
         )
 
         if args.summary:        # call summary if requested

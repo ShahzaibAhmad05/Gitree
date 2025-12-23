@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import List, Optional
 from ..utilities.gitignore import GitIgnoreMatcher
 from ..services.list_enteries import list_entries
-from ..constants.constant import BRANCH, LAST, SPACE, VERT
+from ..constants.constant import (BRANCH, LAST, SPACE, VERT, 
+                                  FILE_EMOJI, EMPTY_DIR_EMOJI, 
+                                  NORMAL_DIR_EMOJI)
 import pathspec
 from collections import defaultdict  
 
@@ -18,6 +20,7 @@ def draw_tree(
     max_items: Optional[int] = None,
     ignore_depth: Optional[int] = None,
     no_files: bool = False,
+    emoji: bool = False,
 ) -> None:
     gi = GitIgnoreMatcher(root, enabled=respect_gitignore, gitignore_depth=gitignore_depth)
 
@@ -59,7 +62,17 @@ def draw_tree(
             is_last = i == len(entries) - 1 and truncated == 0
             connector = LAST if is_last else BRANCH
             suffix = "/" if entry.is_dir() else ""
-            print(prefix + connector + entry.name + suffix)
+            if emoji:
+                print(prefix + connector + entry.name + suffix)
+            else:
+                if entry.is_file():
+                    emoji_str = FILE_EMOJI
+                else:
+                    try:
+                        emoji_str = EMPTY_DIR_EMOJI if (entry.is_dir() and not any(entry.iterdir())) else NORMAL_DIR_EMOJI
+                    except PermissionError:
+                        emoji_str = NORMAL_DIR_EMOJI
+                print(prefix + connector + emoji_str + " " + entry.name + suffix)
 
             if entry.is_dir():
                 rec(entry, prefix + (SPACE if is_last else VERT),  current_depth + 1, patterns)
