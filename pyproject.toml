@@ -3,17 +3,40 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "Gitree"
-version = "1.3.1"
+name = "gitree"
+version = "1.0.0"
 description = "Gitree: git-aware project tree printing and zipping for docs and LLMs"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
 authors = [{ name = "Shahzaib Ahmad" }]
 dependencies = ["pathspec>=0.11", "pyperclip>=1.5"]
+keywords = ["tree", "directory-tree", "git", "gitignore", "cli", "docs", "llm"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Utilities",
+]
 
 [project.scripts]
 gitree = "gitree.main:main"
+
+[project.urls]
+Homepage = "https://github.com/ShahzaibAhmad05/gitree"
+Repository = "https://github.com/ShahzaibAhmad05/gitree"
+Issues = "https://github.com/ShahzaibAhmad05/gitree/issues"
+Changelog = "https://github.com/ShahzaibAhmad05/gitree/releases"
 
 [tool.setuptools.packages.find]
 where = ["."]

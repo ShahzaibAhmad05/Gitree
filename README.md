@@ -37,11 +37,13 @@ You can also specify a path explicitly:
 gitree <directory_path>
 ```
 
-Example (Windows PowerShell):
+Example on Windows PowerShell:
 
 ```
 PS C:/Users/Projects/Gitree> gitree .
 ```
+
+**Note:** The dot after the name call is **not required**. It is default.
 
 Output:
 
@@ -110,6 +112,12 @@ pip install -r requirements.txt
 ```
 
 The tool is now available as a Python CLI on your system.
+
+For running directly from main without installing:
+
+```
+python -m gitree.main
+```
 
 <br>
 
