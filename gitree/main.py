@@ -45,6 +45,20 @@ def main() -> None:
         original_stdout = sys.stdout
         sys.stdout = output_buffer
 
+    # If interactive mode is enabled
+    selected_files = None
+    if args.interactive:
+        from .services.interactive import select_files
+        selected_files = select_files(
+            root=root,
+            respect_gitignore=not args.no_gitignore,
+            gitignore_depth=args.gitignore_depth,
+            extra_ignores=args.ignore
+        )
+        if not selected_files:
+            print("No files selected. Exiting.")
+            return
+
     # if zipping is requested
     if args.zip is not None:
         zip_project(
@@ -57,6 +71,7 @@ def main() -> None:
             ignore_depth=args.ignore_depth,
             depth=args.depth,
             no_files=args.no_files,
+            whitelist=selected_files
         )
     else:       # else, print the tree normally
         draw_tree(
@@ -70,6 +85,7 @@ def main() -> None:
             ignore_depth=args.ignore_depth,
             no_files=args.no_files,
             emoji=args.emoji,
+            whitelist=selected_files
         )
 
         if args.summary:        # call summary if requested
