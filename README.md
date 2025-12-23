@@ -1,13 +1,13 @@
-# PrintStruct
+# Gitree
 
-**PrintStruct** is a clean, lightweight Python CLI that prints a directory tree of your project **while respecting `.gitignore`**, with optional zipping support.
+A git-aware (but not git-required) project tree printer **and zipper** for documentation, PRs and LLM workflows.
 
 The problems it solves:
 
 * sharing project structure in issues or pull requests
 * generating directory trees for documentation
 * pasting project layouts into LLMs
-* zipping projects for feeding to LLMs using `.gitignore` directions
+* **zipping projects using `.gitignore` rules for safe sharing with LLMs**
 
 <br>
 
@@ -18,7 +18,7 @@ The problems it solves:
 Run this command in your terminal:
 
 ```
-pip install printstruct
+pip install gitree
 ```
 
 ### Usage:
@@ -26,7 +26,7 @@ pip install printstruct
 Open a terminal in any project and run:
 
 ```
-prst
+gitree
 ```
 
 This prints the directory structure of the current folder.
@@ -34,19 +34,19 @@ This prints the directory structure of the current folder.
 You can also specify a path explicitly:
 
 ```
-prst <directory_path>
+gitree <directory_path>
 ```
 
 Example (Windows PowerShell):
 
 ```
-PS C:/Users/Projects/PrintStruct> prst .
+PS C:/Users/Projects/Gitree> gitree .
 ```
 
 Output:
 
 ```
-PrintStruct
+Gitree
 ├─ LICENSE
 ├─ pyproject.toml
 ├─ README.md
@@ -54,7 +54,15 @@ PrintStruct
 └─ structure.py
 ```
 
-### Updating PrintStruct:
+For zipping a directory:
+
+```
+gitree . --zip out
+```
+
+creates out.zip in the same directory.
+
+### Updating Gitree:
 
 To update the tool, reinstall it using pip. Pip will automatically replace the older version with the latest release.
 
@@ -86,13 +94,13 @@ In addition to the directory path, the following options are available:
 Clone the repository:
 
 ```
-git clone https://github.com/ShahzaibAhmad05/PrintStruct
+git clone https://github.com/ShahzaibAhmad05/Gitree
 ```
 
 Move into the project directory:
 
 ```
-cd PrintStruct
+cd Gitree
 ```
 
 Install dependencies:
@@ -110,4 +118,4 @@ The tool is now available as a Python CLI on your system.
 Issues and pull requests are welcome.
 Ideas that would fit well include improved formatting, colorized output, test coverage, and performance optimizations.
 
-PrintStruct is intentionally small and readable, so contributions that preserve simplicity are especially appreciated.
+Gitree is intentionally small and readable, so contributions that preserve simplicity are especially appreciated.

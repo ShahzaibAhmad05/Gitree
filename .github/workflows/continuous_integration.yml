@@ -21,8 +21,5 @@ jobs:
       - name: Install package (editable)
         run: pip install -e .
 
-      - name: Test CLI (prst)
-        run: prst .
-
-      - name: Test CLI (printstruct)
-        run: printstruct .
+      - name: Test CLI (gitree)
+        run: gitree .

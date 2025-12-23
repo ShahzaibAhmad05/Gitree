@@ -1,6 +1,6 @@
 # Security Policy
 
-Thank you for helping keep PrintStruct secure. We take security issues seriously and appreciate responsible disclosure.
+Thank you for helping keep Gitree secure. We take security issues seriously and appreciate responsible disclosure.
 
 ## Supported Versions
 

@@ -1,6 +1,6 @@
 # CONTRIBUTING
 
-Thank you for your interest in contributing to PrintStruct! 🎉
+Thank you for your interest in contributing to Gitree! 🎉
 
 We welcome all kinds of improvements - from bug fixes and formatting to new features and documentation.
 
