@@ -5,7 +5,7 @@ if sys.platform.startswith('win'):      # fix windows unicode error on CI
     sys.stdout.reconfigure(encoding='utf-8')
 
 from pathlib import Path
-from .services.draw_tree import draw_tree, print_summary  # <<< IMPORT print_summary
+from .services.draw_tree import draw_tree, print_summary 
 from .services.zip_project import zip_project
 from .services.parser import parse_args
 from .utilities.utils import get_project_version
@@ -71,8 +71,7 @@ def main() -> None:
             no_files=args.no_files,
         )
 
-        #to call summary
-        if args.summary:
+        if args.summary:        # call summary if requested
             print_summary(root)
 
         if args.out is not None:     # that file output code again
