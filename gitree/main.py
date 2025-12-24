@@ -15,7 +15,7 @@ from .utilities.config import load_config, create_default_config, open_config_in
 def main() -> None:
     args = parse_args()
 
-    # Handle config commands that exit immediately
+    # Handle config + version commands that exit immediately
     if args.init_config:
         create_default_config()
         return
@@ -31,33 +31,33 @@ def main() -> None:
     # Load config file if it exists and --no-config is not set
     if not args.no_config:
         config = load_config()
-        if config:
-            # Get default values to identify which args are at defaults
+        if config:      # If the user has setup a configuration file
             defaults = get_default_config()
 
             # Merge config values with args (CLI args take precedence)
             # Only use config value if arg is still at its default value
-            if args.max_items == 20 and "max_items" in config:
+            if args.max_items == defaults["max_items"] and "max_items" in config:
                 args.max_items = config["max_items"]
-            if args.depth is None and "depth" in config:
+            if args.depth == defaults["depth"] and "depth" in config:
                 args.depth = config["depth"]
-            if args.gitignore_depth is None and "gitignore_depth" in config:
+            if args.gitignore_depth == defaults["gitignore_depth"] and "gitignore_depth" in config:
                 args.gitignore_depth = config["gitignore_depth"]
-            if args.ignore_depth is None and "ignore_depth" in config:
+            if args.ignore_depth == defaults["ignore_depth"] and "ignore_depth" in config:
                 args.ignore_depth = config["ignore_depth"]
-            if args.emoji == True and "emoji" in config:  # Note: --emoji flag uses action="store_false" (inverted)
+            if args.emoji == defaults["emoji"] and "emoji" in config:  
+                # Note: --emoji flag uses action="store_false" (inverted)
                 # Config uses intuitive naming: true = show emojis
                 # But args.emoji is inverted: False = show emojis
                 args.emoji = not config["emoji"]
-            if not args.all and "show_all" in config:
+            if args.all == defaults["show_all"] and "show_all" in config:
                 args.all = config["show_all"]
-            if not args.no_gitignore and "no_gitignore" in config:
+            if args.no_gitignore == defaults["no_gitignore"] and "no_gitignore" in config:
                 args.no_gitignore = config["no_gitignore"]
-            if not args.no_files and "no_files" in config:
+            if args.no_files == defaults["no_files"] and "no_files" in config:
                 args.no_files = config["no_files"]
-            if not args.no_limit and "no_limit" in config:
+            if args.no_limit == defaults["no_limit"] and "no_limit" in config:
                 args.no_limit = config["no_limit"]
-            if not args.summary and "summary" in config:
+            if args.summary == defaults["summary"] and "summary" in config:
                 args.summary = config["summary"]
 
     root = Path(args.path).resolve()
