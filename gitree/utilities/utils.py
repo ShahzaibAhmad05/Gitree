@@ -1,8 +1,6 @@
 import argparse
-import random
-import os
-import tomllib
 import pathspec
+import random, os, pyperclip, sys
 from pathlib import Path
 from typing import List, Optional
 
@@ -69,6 +67,26 @@ def matches_extra(p: Path, root: Path, patterns: List[str], ignore_depth: Option
         return True
     if p.is_dir() and spec.match_file(rel + "/"):
         return True
+
+    return False
+
+
+def copy_to_clipboard(text: str) -> bool:
+    """
+    Attempts to copy text to clipboard using pyperclip.
+
+    Args:
+      text (str): The text to copy.
+
+    Returns:
+      True if successful, False otherwise.
+    """
+
+    try:        # Try pyperclip
+        pyperclip.copy(text)
+        return True
+    except Exception as e:
+        print("pyperclip failed to copy to clipboard: ", e, file=sys.stderr)
 
     return False
 
