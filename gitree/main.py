@@ -67,15 +67,8 @@ def main() -> None:
     # If --no-limit is set, disable max_items
     max_items = None if args.no_limit else args.max_items
 
-    if args.out is not None:     # TODO: relocate this code for file output
-        # Determine filename
-        filename = args.out
-        # Add .txt extension only if no extension provided
-        if not Path(filename).suffix:
-            filename += '.txt'
-
-    if args.copy or args.out is not None:
-        # Capture stdout
+    if args.copy:
+        # Capture stdout for clipboard
         output_buffer = io.StringIO()
         original_stdout = sys.stdout
         sys.stdout = output_buffer
@@ -128,23 +121,38 @@ def main() -> None:
         if args.summary:        # call summary if requested
             print_summary(root)
 
-        if args.out is not None:     # that file output code again
-            # Write to file
-            content = output_buffer.getvalue()
-
-            # Wrap in markdown code block if .md extension
-            if filename.endswith('.md'):
-                content = f"```\n{content}```\n"
-
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(content)
-
-        if args.copy:       # Capture output if needed for clipboard
+        if args.copy:       # Restore stdout and copy to clipboard
+            sys.stdout = original_stdout
             content = output_buffer.getvalue() + "\n"
             if not copy_to_clipboard(content):
                 print("Warning: Could not copy to clipboard. Please install a clipboard utility (xclip, wl-copy) or ensure your environment supports it.", file=sys.stderr)
             # TODO: place an else statement here with a 
             # success message when verbose is added
+
+        # Handle file outputs
+        if args.json or args.txt or args.md:
+            from .services.output_formatters import build_tree_data, write_outputs
+
+            tree_data = build_tree_data(
+                root=root,
+                depth=args.max_depth,
+                show_all=args.all,
+                extra_ignores=args.ignore,
+                respect_gitignore=not args.no_gitignore,
+                gitignore_depth=args.gitignore_depth,
+                max_items=max_items,
+                ignore_depth=args.ignore_depth,
+                no_files=args.no_files,
+                whitelist=selected_files
+            )
+
+            write_outputs(
+                tree_data=tree_data,
+                json_path=args.json,
+                txt_path=args.txt,
+                md_path=args.md,
+                emoji=args.emoji
+            )
 
 if __name__ == "__main__":
     main()
