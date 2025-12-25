@@ -4,7 +4,7 @@ from ..utilities.utils import max_items_int, get_unused_file_path
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Print a directory tree (respects .gitignore).")
-    ap.add_argument("path", nargs="?", default=".", help="Root path")
+    ap.add_argument("paths", nargs="*", default=["."], help="Root paths (supports multiple directories and file patterns)")
     ap.add_argument("--max-depth", type=int, default=None, help="Maximum depth to traverse")
     ap.add_argument("-a", "--all", action="store_true")
     ap.add_argument("--exclude", nargs="*", default=[], help="Patterns of files to exclude (e.g. *.pyc, __pycache__)")
@@ -14,7 +14,10 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--max-items", type=max_items_int, default=20, help="Limit items shown per directory (default: 20). Use --no-limit for unlimited.")
     ap.add_argument("-v", "--version", action="store_true", help="Display the version of the tool")
     ap.add_argument("-z", "--zip", default=None, help="Create a zip file containing files under path (respects .gitignore)")
-    ap.add_argument("-o", "--out", default=None, help="Save tree structure to file")
+    ap.add_argument("--json", default=None, metavar="FILE", help="Export tree as JSON to specified file")
+    ap.add_argument("--txt", default=None, metavar="FILE", help="Export tree as text to specified file")
+    ap.add_argument("--md", default=None, metavar="FILE", help="Export tree as Markdown to specified file")
+    ap.add_argument("-o", "--output", default=None, help="Save tree structure to file")
     ap.add_argument("-c", "--copy", action="store_true", help="Copy tree output to clipboard")
     ap.add_argument("-e", "--emoji", action="store_false", help="Show emojis in tree output")
     ap.add_argument("--summary",action="store_true",help="Print a summary of the number of files and folders at each level")
