@@ -194,5 +194,30 @@ def main() -> None:
             # TODO: place an else statement here with a 
             # success message when verbose is added
 
+        # Handle file outputs
+        if args.json or args.txt or args.md:
+            from .services.output_formatters import build_tree_data, write_outputs
+
+            tree_data = build_tree_data(
+                root=root,
+                depth=args.max_depth,
+                show_all=args.all,
+                extra_ignores=args.ignore,
+                respect_gitignore=not args.no_gitignore,
+                gitignore_depth=args.gitignore_depth,
+                max_items=max_items,
+                ignore_depth=args.ignore_depth,
+                no_files=args.no_files,
+                whitelist=selected_files
+            )
+
+            write_outputs(
+                tree_data=tree_data,
+                json_path=args.json,
+                txt_path=args.txt,
+                md_path=args.md,
+                emoji=args.emoji
+            )
+
 if __name__ == "__main__":
     main()
