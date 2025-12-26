@@ -2,6 +2,7 @@ import questionary
 from pathlib import Path
 from typing import List, Set
 from ..utilities.gitignore import GitIgnoreMatcher
+from ..utilities.utils import matches_file_type
 from ..services.list_enteries import list_entries
 import pathspec
 
@@ -10,7 +11,8 @@ def select_files(
     respect_gitignore: bool = True,
     gitignore_depth: int = None,
     extra_excludes: List[str] = None,
-    include_patterns: List[str] = None
+    include_patterns: List[str] = None,
+    include_file_types: List[str] = None
 ) -> Set[str]:
     """
     Scans the directory and prompts the user to select files.
@@ -70,9 +72,21 @@ def select_files(
                 # Store relative path for display
                 rel_path = entry.relative_to(root).as_posix()
 
-                # Filter based on include patterns (if any provided)
-                if include_spec and not include_spec.match_file(rel_path):
-                    continue
+                # Filter based on include patterns or file types (if any provided)
+                if include_spec or include_file_types:
+                    matches_include = False
+
+                    # Check if matches include patterns
+                    if include_spec and include_spec.match_file(rel_path):
+                        matches_include = True
+
+                    # Check if matches file types
+                    if not matches_include and include_file_types and matches_file_type(entry, include_file_types):
+                        matches_include = True
+
+                    # Only include if it matches at least one criterion
+                    if not matches_include:
+                        continue
 
                 files_to_select.append(questionary.Choice(rel_path, checked=True))
 

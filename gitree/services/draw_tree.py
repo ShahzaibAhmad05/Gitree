@@ -22,6 +22,8 @@ def draw_tree(
     no_files: bool = False,
     emoji: bool = False,
     whitelist: Optional[Set[str]] = None,
+    include_patterns: List[str] = None,
+    include_file_types: List[str] = None,
 ) -> None:
     gi = GitIgnoreMatcher(root, enabled=respect_gitignore, gitignore_depth=gitignore_depth)
 
@@ -57,6 +59,8 @@ def draw_tree(
             max_items=max_items,
             exclude_depth=exclude_depth,
             no_files=no_files,
+            include_patterns=include_patterns,
+            include_file_types=include_file_types,
         )
 
         filtered_entries = []
@@ -112,6 +116,8 @@ def print_summary(
     respect_gitignore: bool = True,
     gitignore_depth: Optional[int] = None,
     extra_excludes: Optional[List[str]] = None,
+    include_patterns: List[str] = None,
+    include_file_types: List[str] = None,
 ) -> None:
     summary = defaultdict(lambda: {"dirs": 0, "files": 0})
     gi = GitIgnoreMatcher(root, enabled=respect_gitignore, gitignore_depth=gitignore_depth)
@@ -144,6 +150,8 @@ def print_summary(
             max_items=None,
             exclude_depth=None,
             no_files=False,
+            include_patterns=include_patterns,
+            include_file_types=include_file_types,
         )
 
         for entry in entries:

@@ -19,6 +19,8 @@ def zip_project_to_handle(
     no_files: bool = False,
     whitelist: Optional[Set[str]] = None,
     arcname_prefix: str = "",
+    include_patterns: List[str] = None,
+    include_file_types: List[str] = None,
 ) -> None:
     """
     Add files from root to an existing ZipFile handle, respecting .gitignore like draw_tree().
@@ -59,6 +61,8 @@ def zip_project_to_handle(
             max_items=None,
             exclude_depth=exclude_depth,
             no_files=no_files,
+            include_patterns=include_patterns,
+            include_file_types=include_file_types,
         )
 
         for entry in entries:
@@ -101,6 +105,8 @@ def zip_project(
     exclude_depth: Optional[int] = None,
     no_files: bool = False,
     whitelist: Optional[Set[str]] = None,
+    include_patterns: List[str] = None,
+    include_file_types: List[str] = None,
 ) -> None:
     """
     Create <zip_stem>.zip with all files under root, respecting .gitignore like draw_tree().
@@ -143,6 +149,8 @@ def zip_project(
                 max_items=None,
                 exclude_depth=exclude_depth,
                 no_files=no_files,
+                include_patterns=include_patterns,
+                include_file_types=include_file_types,
             )
 
             for entry in entries:
