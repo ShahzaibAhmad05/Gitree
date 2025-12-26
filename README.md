@@ -173,6 +173,25 @@ pip install -U gitree
 Pip will automatically replace the older version with the latest release.
 
 
+## 🧪 Continuous Integration (CI)
+
+Gitree uses Continuous Integration (CI) to ensure code quality and prevent regressions on every change.
+
+### What CI Does
+- Runs automated checks on every pull request
+- Verifies that all CLI arguments work as expected
+- Ensures the tool behaves consistently across updates
+
+### Current Test Coverage
+
+| Test Type | Description |
+|----------|-------------|
+| CLI Argument Tests | Validates all supported CLI flags and options |
+| Workflow Checks | Ensures PRs follow required checks before merging |
+
+> ℹ️ CI tests are continuously expanding as new features are added.
+
+
 ## ⚙️ CLI Arguments
 
 In addition to the directory path, the following options are available:
@@ -182,7 +201,6 @@ In addition to the directory path, the following options are available:
 | `--version`, `-v`   | Displays the installed version. |
 | `--max-depth`           | Limits recursion depth. Example: `--depth 1` shows only top-level files and folders. |
 | `--all`, `-a`       | Includes hidden files and directories. Does not override `.gitignore`. |
-| `--ignore`          | Adds extra files or directories to ignore. |
 | `--ignore-depth`    | Limits depth for `--ignore` patterns. Example: `--ignore-depth 2` applies ignore rules only to first 2 levels. |
 | `--gitignore-depth` | Controls how deeply `.gitignore` files are discovered. Example: `--gitignore-depth 0` uses only the root `.gitignore`. |
 | `--no-gitignore`    | Ignores all `.gitignore` rules when set. |
@@ -210,18 +228,43 @@ Move into the project directory:
 cd Gitree
 ```
 
-Install dependencies:
+Setup a Virtual Environment (to avoid package conflicts):
+
+```
+python -m venv .venv
+```
+
+Activate the virtual environment:
+
+```
+.venv/Scripts/Activate      # on windows
+.venv/bin/activate          # on linux/macOS
+```
+
+If you get an execution policy error on windows, run this:
+
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+Install dependencies in the virtual environment:
 
 ```
 pip install -r requirements.txt
 ```
 
-The tool is now available as a Python CLI on your system.
+The tool is now available as a Python CLI in your virtual environment.
 
-For running directly from main without installing:
+For running the tool, type (venv should be activated):
 
 ```
-python -m gitree.main
+gitree
+```
+
+For running tests after making any changes:
+
+```
+python -m unittest discover tests
 ```
 
 
