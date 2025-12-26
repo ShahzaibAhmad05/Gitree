@@ -200,21 +200,52 @@ In addition to the directory path, the following options are available:
 |---------------------|-------------|
 | `--version`, `-v`   | Displays the installed version. |
 | `--max-depth`           | Limits recursion depth. Example: `--depth 1` shows only top-level files and folders. |
-| `--all`, `-a`       | Includes hidden files and directories. Does not override `.gitignore`. |
-| `--ignore-depth`    | Limits depth for `--ignore` patterns. Example: `--ignore-depth 2` applies ignore rules only to first 2 levels. |
+| `--hidden-items`    | Includes hidden files and directories. Does not override `.gitignore`. |
+| `--exclude`         | Patterns of files to exclude. Example: `--exclude *.pyc __pycache__`. |
+| `--exclude-depth`   | Limits depth for `--exclude` patterns. Example: `--exclude-depth 2` applies exclude rules only to first 2 levels. |
 | `--gitignore-depth` | Controls how deeply `.gitignore` files are discovered. Example: `--gitignore-depth 0` uses only the root `.gitignore`. |
 | `--no-gitignore`    | Ignores all `.gitignore` rules when set. |
 | `--max-items`       | Limits items shown per directory. Extra items are summarized as `... and x more items`. Default: `20`. |
 | `--no-limit`        | Removes the per-directory item limit. |
 | `--no-files`        | Hide files from the tree (only show directories). |
-| `--emoji`           | Show emojis in tree output. |
+| `--emoji`, `-e`     | Show emojis in tree output. |
 | `--summary`         | Print a summary of the number of files and folders at each level. |
-| `--zip [name]`, `-z` | Zips the project while respecting `.gitignore`. Example: `--zip a` creates `a.zip`. If no name is provided, a random ID is used. |
-| `--out [file]`, `-o` | Save tree structure to file. Example: `--out tree.txt` or `--out tree.md` for markdown format. |
+| `--zip [name]`, `-z` | Zips the project while respecting `.gitignore`. Example: `--zip a` creates `a.zip`. |
+| `--json [file]`     | Export tree as JSON to specified file. Example: `--json tree.json`. |
+| `--txt [file]`      | Export tree as text to specified file. Example: `--txt tree.txt`. |
+| `--md [file]`       | Export tree as Markdown to specified file. Example: `--md tree.md`. |
+| `--output [file]`, `-o` | Save tree structure to file. Example: `--output tree.txt` or `--output tree.md` for markdown format. |
 | `--copy`, `-c`      | Copy tree output to clipboard. |
 | `--include`         | Patterns of files to include (used in interactive mode). Example: `--include *.py *.js`. |
 | `--include-file-type` | Include files of a specific type. Example: `--include-file-type json` or `--include-file-type .py`. Case-insensitive. |
 | `--include-file-types` | Include files of multiple types. Example: `--include-file-types png jpg json`. Case-insensitive. |
+| `--json [file]`     | Export tree as JSON to specified file. **By default, includes file contents** (up to 1MB per file). |
+| `--txt [file]`      | Export tree as text to specified file. **By default, includes file contents** (up to 1MB per file). |
+| `--md [file]`       | Export tree as Markdown to specified file. **By default, includes file contents** with syntax highlighting (up to 1MB per file). |
+| `--no-contents`     | Don't include file contents when exporting to JSON, TXT, or MD formats. Only the tree structure will be included. |
+| `--interactive`, `-i` | Interactive mode: select files to include using a terminal-based UI. |
+| `--include`         | Patterns of files to include. Example: `--include *.py *.js`. |
+| `--init-config`     | Create a default `config.json` file in the current directory. |
+| `--config-user`     | Open `config.json` in the default editor. |
+| `--no-config`       | Ignore `config.json` and use hardcoded defaults. |
+
+
+## 📝 File Contents in Exports
+
+When using `--json`, `--txt`, or `--md` flags, **file contents are included by default**. This feature:
+
+- ✅ Includes text file contents (up to 1MB per file)
+- ✅ Detects and marks binary files as `[binary file]`
+- ✅ Handles large files by marking them as `[file too large: X.XXmb]`
+- ✅ Uses syntax highlighting in Markdown format based on file extension
+- ✅ Works with all filtering options (`--exclude`, `--include`, `.gitignore`, etc.)
+
+To export only the tree structure without file contents, use the `--no-contents` flag:
+
+```bash
+gitree --json output.json --no-contents
+```
+>>>>>>> main
 
 
 ## Installation (for Contributors)

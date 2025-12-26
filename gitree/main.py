@@ -48,8 +48,8 @@ def main() -> None:
                 # Config uses intuitive naming: true = show emojis
                 # But args.emoji is inverted: False = show emojis
                 args.emoji = not config["emoji"]
-            if args.all == defaults["show_all"] and "show_all" in config:
-                args.all = config["show_all"]
+            if args.hidden_items == defaults["show_all"] and "show_all" in config:
+                args.hidden_items = config["show_all"]
             if args.no_gitignore == defaults["no_gitignore"] and "no_gitignore" in config:
                 args.no_gitignore = config["no_gitignore"]
             if args.no_files == defaults["no_files"] and "no_files" in config:
@@ -105,7 +105,7 @@ def main() -> None:
     # if zipping is requested
     if args.zip is not None:
         import zipfile
-        zip_path = Path(f"{args.zip}.zip").resolve()
+        zip_path = Path(f"{args.zip}.zip" if "." not in args.zip else f"{args.zip}").resolve()
 
         with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
             for root in roots:
@@ -133,7 +133,7 @@ def main() -> None:
                 zip_project_to_handle(
                     z=z,
                     root=root,
-                    show_all=args.all,
+                    show_all=args.hidden_items,
                     extra_excludes=args.exclude,
                     respect_gitignore=not args.no_gitignore,
                     gitignore_depth=args.gitignore_depth,
@@ -172,7 +172,7 @@ def main() -> None:
             draw_tree(
                 root=root,
                 depth=args.max_depth,
-                show_all=args.all,
+                show_all=args.hidden_items,
                 extra_excludes=args.exclude,
                 respect_gitignore=not args.no_gitignore,
                 gitignore_depth=args.gitignore_depth,
@@ -217,10 +217,13 @@ def main() -> None:
         if args.json or args.txt or args.md:
             from .services.output_formatters import build_tree_data, write_outputs
 
+            # Include contents by default, unless --no-contents is specified
+            include_contents = not args.no_contents
+
             tree_data = build_tree_data(
                 root=root,
                 depth=args.max_depth,
-                show_all=args.all,
+                show_all=args.hidden_items,
                 extra_excludes=args.exclude,
                 respect_gitignore=not args.no_gitignore,
                 gitignore_depth=args.gitignore_depth,
@@ -229,7 +232,8 @@ def main() -> None:
                 no_files=args.no_files,
                 whitelist=selected_files,
                 include_patterns=args.include,
-                include_file_types=include_file_types
+                include_file_types=include_file_types,
+                include_contents=include_contents
             )
 
             write_outputs(
@@ -237,7 +241,8 @@ def main() -> None:
                 json_path=args.json,
                 txt_path=args.txt,
                 md_path=args.md,
-                emoji=args.emoji
+                emoji=args.emoji,
+                include_contents=include_contents
             )
 
 if __name__ == "__main__":
