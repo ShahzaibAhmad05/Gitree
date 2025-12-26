@@ -71,6 +71,35 @@ def matches_extra(p: Path, root: Path, patterns: List[str], ignore_depth: Option
     return False
 
 
+def matches_file_type(p: Path, file_types: List[str]) -> bool:
+    """Check if path matches any of the specified file types (extensions).
+
+    Args:
+        p: Path to check
+        file_types: List of file extensions (with or without dots, case-insensitive)
+
+    Returns:
+        True if the file extension matches any of the provided types
+    """
+    if not file_types or not p.is_file():
+        return False
+
+    # Get file extension (lowercase for case-insensitive comparison)
+    file_ext = p.suffix.lower()
+
+    # Check each file type
+    for ft in file_types:
+        # Normalize the file type (add dot if missing, lowercase)
+        normalized_ft = ft.lower()
+        if not normalized_ft.startswith('.'):
+            normalized_ft = '.' + normalized_ft
+
+        if file_ext == normalized_ft:
+            return True
+
+    return False
+
+
 def copy_to_clipboard(text: str) -> bool:
     """
     Attempts to copy text to clipboard using pyperclip.

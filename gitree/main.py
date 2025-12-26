@@ -82,6 +82,13 @@ def main() -> None:
     # If --no-limit is set, disable max_items
     max_items = None if args.no_limit else args.max_items
 
+    # Combine file types from both singular and plural flags
+    include_file_types = []
+    if args.include_file_type:
+        include_file_types.append(args.include_file_type)
+    if args.include_file_types:
+        include_file_types.extend(args.include_file_types)
+
     if args.output is not None:     # TODO: relocate this code for file output
         # Determine filename
         filename = args.output
@@ -111,7 +118,8 @@ def main() -> None:
                         respect_gitignore=not args.no_gitignore,
                         gitignore_depth=args.gitignore_depth,
                         exclude_patterns=args.exclude,
-                        include_patterns=args.include
+                        include_patterns=args.include,
+                        include_file_types=include_file_types
                     )
                     if not selected_files:
                         continue
@@ -133,7 +141,9 @@ def main() -> None:
                     depth=args.max_depth,
                     no_files=args.no_files,
                     whitelist=selected_files,
-                    arcname_prefix=prefix
+                    arcname_prefix=prefix,
+                    include_patterns=args.include,
+                    include_file_types=include_file_types
                 )
     else:       # else, print the tree normally
         for i, root in enumerate(roots):
@@ -147,7 +157,8 @@ def main() -> None:
                     gitignore_depth=args.gitignore_depth,
                     extra_excludes=args.exclude,
                     include_patterns=args.include,
-                    exclude_patterns=args.exclude
+                    exclude_patterns=args.exclude,
+                    include_file_types=include_file_types
                 )
                 if not selected_files:
                     continue
@@ -169,11 +180,20 @@ def main() -> None:
                 exclude_depth=args.exclude_depth,
                 no_files=args.no_files,
                 emoji=args.emoji,
-                whitelist=selected_files
+                whitelist=selected_files,
+                include_patterns=args.include,
+                include_file_types=include_file_types
             )
 
             if args.summary:        # call summary if requested
-                print_summary(root)
+                print_summary(
+                    root,
+                    respect_gitignore=not args.no_gitignore,
+                    gitignore_depth=args.gitignore_depth,
+                    extra_excludes=args.exclude,
+                    include_patterns=args.include,
+                    include_file_types=include_file_types
+                )
 
         if args.output is not None:     # that file output code again
             # Write to file
@@ -207,7 +227,9 @@ def main() -> None:
                 max_items=max_items,
                 exclude_depth=args.exclude_depth,
                 no_files=args.no_files,
-                whitelist=selected_files
+                whitelist=selected_files,
+                include_patterns=args.include,
+                include_file_types=include_file_types
             )
 
             write_outputs(

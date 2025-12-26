@@ -212,6 +212,9 @@ In addition to the directory path, the following options are available:
 | `--zip [name]`, `-z` | Zips the project while respecting `.gitignore`. Example: `--zip a` creates `a.zip`. If no name is provided, a random ID is used. |
 | `--out [file]`, `-o` | Save tree structure to file. Example: `--out tree.txt` or `--out tree.md` for markdown format. |
 | `--copy`, `-c`      | Copy tree output to clipboard. |
+| `--include`         | Patterns of files to include (used in interactive mode). Example: `--include *.py *.js`. |
+| `--include-file-type` | Include files of a specific type. Example: `--include-file-type json` or `--include-file-type .py`. Case-insensitive. |
+| `--include-file-types` | Include files of multiple types. Example: `--include-file-types png jpg json`. Case-insensitive. |
 
 
 ## Installation (for Contributors)

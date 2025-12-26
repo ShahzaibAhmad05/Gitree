@@ -23,6 +23,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--summary",action="store_true",help="Print a summary of the number of files and folders at each level")
     ap.add_argument("-i", "--interactive", action="store_true", help="Interactive mode: select files to include")
     ap.add_argument("--include", nargs="*", default=[], help="Patterns of files to include (e.g. *.py)")
+    ap.add_argument("--include-file-type", type=str, default=None, help="Include files of a specific type (e.g. json, py)")
+    ap.add_argument("--include-file-types", nargs="*", default=[], help="Include files of multiple types (e.g. png jpg)")
     ap.add_argument("--init-config", action="store_true", help="Create a default config.json file in the current directory")
     ap.add_argument("--config-user", action="store_true", help="Open config.json in the default editor")
     ap.add_argument("--no-limit", action="store_true", help="Show all items regardless of count")
