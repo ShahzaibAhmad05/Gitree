@@ -182,6 +182,13 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Ignore config.json and use hardcoded defaults",
     )
+    ap.add_argument(
+        "--no-contents-for",
+        nargs="+",
+        default=[],
+        metavar="PATH",
+        help="Do not save file contents for specific files or directories"
+    )
 
     return ap.parse_args()
 
