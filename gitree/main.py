@@ -156,9 +156,10 @@ def main() -> None:
         if args.copy:       # Capture output if needed for clipboard
             content = output_buffer.getvalue() + "\n"
             if not copy_to_clipboard(content):
-                print("Warning: Could not copy to clipboard. Please install a clipboard utility (xclip, wl-copy) or ensure your environment supports it.", file=sys.stderr)
-            # TODO: place an else statement here with a 
-            # success message when verbose is added
+                output_buffer.write("Warning: Could not copy to clipboard. Please install a clipboard utility (xclip, wl-copy) or ensure your environment supports it.")
+            else:
+                logger.write(Logger.INFO, "Tree output copied to clipboard successfully.\n")
+
 
         # Handle file outputs
         if args.json or args.txt or args.md:
@@ -191,6 +192,9 @@ def main() -> None:
                 emoji=args.emoji,
                 include_contents=include_contents
             )
+
+
+    output_buffer.flush()
 
 if __name__ == "__main__":
     main()

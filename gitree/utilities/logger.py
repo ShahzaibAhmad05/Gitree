@@ -1,5 +1,5 @@
 import sys
-from typing import List
+from typing import List, Literal
 
 
 class Logger:
@@ -10,6 +10,16 @@ class Logger:
     all at once when flush() is called.
     """
 
+    # Constant log levels
+    DEBUG = 10
+    INFO = 20
+    WARNING = 30
+    ERROR = 40
+        
+    # Dict for translating levels into names
+    VALID_LEVEL = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+
+
     def __init__(self):
         """
         Initialize the logger with an empty message and outputs list.
@@ -17,14 +27,14 @@ class Logger:
         self._messages: List[str] = []
 
 
-    def log(self, message: str) -> None:
+    def log(self, level: VALID_LEVEL ,message: str) -> None:
         """
         Store a debug message.
 
         Args:
             message: The debug message to store
         """
-        self._messages.append(message)
+        self._messages.append(self._append_level(level, message))
 
 
     def flush(self) -> None:
@@ -61,6 +71,20 @@ class Logger:
             List of stored messages
         """
         return self._messages.copy()
+    
+
+    def _append_level(self, level: VALID_LEVEL, message: str) -> str:
+        """
+        Append the log level to the message.
+
+        Args:
+            level: The log level
+            message: The original message
+
+        Returns:
+            The message prefixed with the log level
+        """
+        return f"[{level}] {message}"
 
 
 class OutputBuffer:
