@@ -133,7 +133,7 @@ def parse_args() -> argparse.Namespace:
         help="Include files of a specific type (e.g. json, py)",
     )
     ap.add_argument(
-        "--include-file-types",
+        "--include-file-type", "--include-file-types",
         nargs="*",
         default=argparse.SUPPRESS,
         help="Include files of multiple types (e.g. png jpg)",

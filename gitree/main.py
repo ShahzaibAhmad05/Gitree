@@ -10,7 +10,7 @@ from .services.zip_project import zip_project
 from .services.parser import parse_args
 from .utilities.utils import copy_to_clipboard
 from .utilities.config import resolve_config
-from .utilities.logger import Logger
+from .utilities.logger import Logger, OutputBuffer
 from .services.files_selection import resolve_selected_files
 from .services.basic_cli_args import handle_basic_cli_args, resolve_root_paths
 
@@ -23,6 +23,8 @@ def main() -> None:
     functionality including tree printing, zipping, and file exports.
     """
     args = parse_args()
+    logger = Logger()
+    output_buffer = OutputBuffer()
 
     # Resolve configuration (handle user, global, and default config merging)
     resolve_config(args)
@@ -35,14 +37,7 @@ def main() -> None:
 
     # Validate and resolve all paths
     roots = resolve_root_paths(args)
-
-
-    # Combine file types from both singular and plural flags
-    include_file_types = []
-    if args.include_file_type:
-        include_file_types.append(args.include_file_type)
-    if args.include_file_types:
-        include_file_types.extend(args.include_file_types)
+    
 
     if args.output is not None:     # TODO: relocate this code for file output
         # Determine filename
@@ -74,7 +69,7 @@ def main() -> None:
                         gitignore_depth=args.gitignore_depth,
                         exclude_patterns=args.exclude,
                         include_patterns=args.include,
-                        include_file_types=include_file_types
+                        include_file_types=args.include_file_types
                     )
                     if not selected_files:
                         continue
@@ -98,7 +93,7 @@ def main() -> None:
                     whitelist=selected_files,
                     arcname_prefix=prefix,
                     include_patterns=args.include,
-                    include_file_types=include_file_types
+                    include_file_types=args.include_file_types
                 )
     else:       # else, print the tree normally
         for i, root in enumerate(roots):
@@ -113,7 +108,7 @@ def main() -> None:
                     extra_excludes=args.exclude,
                     include_patterns=args.include,
                     exclude_patterns=args.exclude,
-                    include_file_types=include_file_types
+                    include_file_types=args.include_file_types
                 )
                 if not selected_files:
                     continue
@@ -137,7 +132,7 @@ def main() -> None:
                 emoji=args.emoji,
                 whitelist=selected_files,
                 include_patterns=args.include,
-                include_file_types=include_file_types
+                include_file_types=args.include_file_types
             )
 
             if args.summary:        # call summary if requested
@@ -147,7 +142,7 @@ def main() -> None:
                     gitignore_depth=args.gitignore_depth,
                     extra_excludes=args.exclude,
                     include_patterns=args.include,
-                    include_file_types=include_file_types
+                    include_file_types=args.include_file_types
                 )
 
         if args.output is not None:     # that file output code again
@@ -187,7 +182,7 @@ def main() -> None:
                 no_files=args.no_files,
                 whitelist=selected_files,
                 include_patterns=args.include,
-                include_file_types=include_file_types,
+                include_file_types=args.include_file_types,
                 include_contents=include_contents
             )
 
