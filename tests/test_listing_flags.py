@@ -4,6 +4,8 @@ import tempfile
 from pathlib import Path
 import unittest
 
+from gitree.constants.constant import FILE_EMOJI, EMPTY_DIR_EMOJI, NORMAL_DIR_EMOJI
+
 
 class TestListingFlags(unittest.TestCase):
     
@@ -35,11 +37,22 @@ class TestListingFlags(unittest.TestCase):
 
 
     def test_entry_point_emoji(self):
+        # Create empty and simple directories to test both emojis
+        (self.root / "empty_folder").mkdir()
+        (self.root / "folder").mkdir()
+        (self.root / "folder" / "nested.txt").write_text('foo')
         result = self._run_cli("--emoji")
 
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertTrue(result.stdout.strip())
-        self.assertIn("file.txt", result.stdout)
+        self.assertIn(self.__build_name_with_emoji('file.txt', FILE_EMOJI), result.stdout)
+        self.assertIn(self.__build_name_with_emoji('nested.txt', FILE_EMOJI), result.stdout)
+        self.assertIn(self.__build_name_with_emoji('empty_folder', EMPTY_DIR_EMOJI), result.stdout)
+        self.assertIn(self.__build_name_with_emoji('folder', NORMAL_DIR_EMOJI), result.stdout)
+
+    @staticmethod
+    def __build_name_with_emoji(file_name: str, emoji: str):
+        return emoji + " " + file_name
 
 
     def test_entry_point_no_files(self):
