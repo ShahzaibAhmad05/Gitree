@@ -44,40 +44,6 @@ def resolve_root_paths(args: argparse.Namespace) -> List[str]:
     return roots
 
 
-def correct_cli_args(args: argparse.Namespace) -> argparse.Namespace:
-    """
-    Correct and validate CLI arguments in place.
-
-    Args:
-        args: Parsed argparse.Namespace object
-    
-    Returns:
-        Corrected argparse.Namespace object
-    """
-    # Fix output path if specified incorrectly
-    if args.output is not None:
-        args.output = fix_output_path(args.output)
-
-    return args
-
-
-def fix_output_path(output_path: str) -> str:
-    """
-    Ensure the output path has a .txt extension.
-
-    Args:
-        output_path: The original output path string
-
-    Returns:
-        The modified output path string with .txt extension if needed
-    """
-    path = Path(output_path)
-    if path.suffix == '':
-        path = path.with_suffix('.txt')
-
-    return str(path)
-
-
 def handle_basic_cli_args(args: argparse.Namespace) -> bool:
     """
     Handle basic CLI args and returns True if one was handled.

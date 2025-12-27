@@ -6,13 +6,12 @@ if sys.platform.startswith('win'):      # fix windows unicode error on CI
 
 from pathlib import Path
 from .services.draw_tree import draw_tree, print_summary
-from .services.zip_project import zip_project
-from .services.parser import parse_args
+from .services.parser import parse_args, correct_args
 from .utilities.utils import copy_to_clipboard
 from .utilities.config import resolve_config
 from .utilities.logger import Logger, OutputBuffer
 from .services.files_selection import resolve_selected_files
-from .services.handle_basic_cli import handle_basic_cli_args, resolve_root_paths, correct_cli_args
+from .services.handle_basic_cli import handle_basic_cli_args, resolve_root_paths
 
 
 def main() -> None:
@@ -32,7 +31,7 @@ def main() -> None:
 
 
     # Fix any incorrect CLI args (paths missing extensions, etc.)
-    args = correct_cli_args(args)
+    args = correct_args(args)
 
 
     # if some specific Basic CLI args given, execute and return
@@ -114,7 +113,7 @@ def main() -> None:
             if len(roots) > 1:
                 if i > 0:
                     print()  # Empty line between trees
-                print(f"=== {root} ===")
+                output_buffer.write(root)
 
             draw_tree(
                 root=root,
