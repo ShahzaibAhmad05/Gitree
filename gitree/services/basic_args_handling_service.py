@@ -9,7 +9,7 @@ def get_project_version() -> str:
     """
     Returns the current version of the project
     """
-    return "0.0.0 (dev)"
+    return "0.2.1"
 
 
 def resolve_root_paths(args: argparse.Namespace, logger: Logger) -> List[str]:
