@@ -16,7 +16,9 @@ def select_files(
     gitignore_depth: int = None,
     extra_excludes: List[str] = None,
     include_patterns: List[str] = None,
-    include_file_types: List[str] = None
+    exclude_patterns: List[str] = None,
+    include_file_types: List[str] = None,
+    files_first: bool = False,
 ) -> Set[str]:
     """
     Present an interactive prompt for users to select files from a directory tree.
@@ -82,6 +84,8 @@ def select_files(
         entries, _ = list_entries(
             dirpath,
             root=root,
+            output_buffer=output_buffer,
+            logger=logger,
             gi=gi,
             spec=spec,
             show_all=False,
@@ -123,9 +127,12 @@ def select_files(
         return set()
 
     selected_rels = questionary.checkbox(
-        "Select files to include:",
-        choices=files_to_select
-    ).ask()
+    "📂 Select files to include:",
+    choices=files_to_select,
+    instruction="Use ↑ ↓ to navigate • Space to toggle • Enter to confirm"
+).ask()
+
+
 
     if selected_rels is None: # Cancelled
         return set()
