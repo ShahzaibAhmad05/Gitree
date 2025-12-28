@@ -55,6 +55,31 @@ def list_entries(
     for e in iter_dir(directory):
         if not show_all and e.name.startswith("."):
             continue
+
+        # Check for forced inclusion (overrides gitignore and other filters)
+        is_force_included = False
+        if include_spec or include_file_types:
+            if e.is_file():
+                if include_spec:
+                    rel_path = e.relative_to(root).as_posix()
+                    if include_spec.match_file(rel_path):
+                        is_force_included = True
+
+                if not is_force_included and include_file_types:
+                    if matches_file_type(e, include_file_types):
+                        is_force_included = True
+            elif e.is_dir():
+                if include_spec:
+                    rel_path = e.relative_to(root).as_posix()
+                    # Check if the directory itself matches the pattern
+                    if include_spec.match_file(rel_path):
+                        is_force_included = True
+        
+        if is_force_included:
+            out.append(e)
+            continue
+        
+        # Normal filters
         if gi.is_ignored(e, spec):
             continue
         if matches_extra(e, root, extra_excludes, exclude_depth):
@@ -63,33 +88,7 @@ def list_entries(
         if no_files and e.is_file():
             continue
 
-        # Apply inclusion filters (if any specified)
-        if include_spec or include_file_types:
-            # Directories always pass (needed for traversal)
-            if e.is_dir():
-                out.append(e)
-                continue
-
-            # Files must match at least one inclusion criterion
-            matches_include = False
-
-            # Check if matches include patterns
-            if include_spec:
-                rel_path = e.relative_to(root).as_posix()
-                if include_spec.match_file(rel_path):
-                    matches_include = True
-
-            # Check if matches file types
-            if not matches_include and include_file_types:
-                if matches_file_type(e, include_file_types):
-                    matches_include = True
-
-            # Only include if it matches at least one criterion
-            if matches_include:
-                out.append(e)
-        else:
-            # No inclusion filters, include everything
-            out.append(e)
+        out.append(e)
 
     if files_first:
         # Sort files first (is_file() is True/1, is_dir() is False/0)
