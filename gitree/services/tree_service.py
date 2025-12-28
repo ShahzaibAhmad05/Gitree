@@ -236,6 +236,8 @@ def run_tree_mode(
             from .interactive import select_files
             selected_files = select_files(
                 root=root,
+                output_buffer=output_buffer,
+                logger=logger,
                 respect_gitignore=not args.no_gitignore,
                 gitignore_depth=args.gitignore_depth,
                 extra_excludes=args.exclude,

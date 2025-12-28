@@ -16,7 +16,9 @@ def select_files(
     gitignore_depth: int = None,
     extra_excludes: List[str] = None,
     include_patterns: List[str] = None,
-    include_file_types: List[str] = None
+    exclude_patterns: List[str] = None,
+    include_file_types: List[str] = None,
+    files_first: bool = False,
 ) -> Set[str]:
     """
     Present an interactive prompt for users to select files from a directory tree.
@@ -82,6 +84,8 @@ def select_files(
         entries, _ = list_entries(
             dirpath,
             root=root,
+            output_buffer=output_buffer,
+            logger=logger,
             gi=gi,
             spec=spec,
             show_all=False,
