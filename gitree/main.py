@@ -46,7 +46,7 @@ def main() -> None:
 
     # if some specific Basic CLI args given, execute and return
     # Handles for --version, --init-config, --config-user, --no-config
-    if handle_basic_cli_args(args): return
+    if handle_basic_cli_args(args): condition_for_no_output = True
 
 
     # Validate and resolve all paths
