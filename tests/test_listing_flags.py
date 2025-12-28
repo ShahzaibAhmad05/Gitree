@@ -1,45 +1,12 @@
-import subprocess
-import sys
-import tempfile
-from pathlib import Path
-import unittest
 from gitree.constants.constant import FILE_EMOJI, EMPTY_DIR_EMOJI, NORMAL_DIR_EMOJI
+from tests.base_setup import BaseCLISetup
 
 
-class TestListingFlags(unittest.TestCase):
-    
-    def setUp(self):
-        # Create a temp project directory for each test
-        self._tmpdir = tempfile.TemporaryDirectory()
-        self.root = Path(self._tmpdir.name)
-
-        # Base project structure
-        (self.root / "file.txt").write_text("hello")
-
-
-    def tearDown(self):
-        # Cleanup temp directory
-        self._tmpdir.cleanup()
-
-
-    def _run_cli(self, *args):
-        """
-        Helper to run the CLI consistently.
-        - args: extra CLI arguments, e.g. "--max-depth 1"
-        """
-        return subprocess.run(
-            [sys.executable, "-m", "gitree.main", *args],
-            cwd=self.root,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-        )
-
+class TestListingFlags(BaseCLISetup):
 
     @staticmethod
     def __build_name_with_emoji(file_name: str, emoji: str):
         return emoji + " " + file_name
-
 
     def test_entry_point_emoji(self):
         # Create empty and simple directories to test both emojis
@@ -55,7 +22,6 @@ class TestListingFlags(unittest.TestCase):
         self.assertIn(self.__build_name_with_emoji('empty_folder', EMPTY_DIR_EMOJI), result.stdout)
         self.assertIn(self.__build_name_with_emoji('folder', NORMAL_DIR_EMOJI), result.stdout)
 
-
     def test_entry_point_no_files(self):
         # Additional structure specific to this test
         (self.root / "folder").mkdir()
@@ -69,7 +35,6 @@ class TestListingFlags(unittest.TestCase):
         self.assertNotIn("file.txt", result.stdout)
         self.assertNotIn("nested.txt", result.stdout)
 
-
     def test_entry_point_max_depth(self):
         (self.root / "folder").mkdir()
         (self.root / "folder" / "nested.txt").write_text("nested")
@@ -81,7 +46,6 @@ class TestListingFlags(unittest.TestCase):
         self.assertIn("file.txt", result.stdout)
         self.assertIn("folder", result.stdout)
         self.assertNotIn("nested.txt", result.stdout)
-
 
     def test_entry_point_no_limit(self):
         # Override base structure for this test
@@ -98,7 +62,6 @@ class TestListingFlags(unittest.TestCase):
 
         for i in range(30):
             self.assertIn(f"file{i}.txt", result.stdout)
-
 
     def test_entry_point_hidden_items(self):
         # Create hidden files and directories
