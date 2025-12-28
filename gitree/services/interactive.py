@@ -123,9 +123,12 @@ def select_files(
         return set()
 
     selected_rels = questionary.checkbox(
-        "Select files to include:",
-        choices=files_to_select
-    ).ask()
+    "📂 Select files to include:",
+    choices=files_to_select,
+    instruction="Use ↑ ↓ to navigate • Space to toggle • Enter to confirm"
+).ask()
+
+
 
     if selected_rels is None: # Cancelled
         return set()
