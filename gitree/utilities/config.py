@@ -44,7 +44,8 @@ def get_default_config() -> Dict[str, Any]:
         "interactive": False,
 
         # toggles
-        "emoji": False, 
+        "emoji": False,
+        "no_color": False,
         "no_gitignore": False,
         "no_files": False,
         "no_limit": False,
@@ -99,9 +100,9 @@ def validate_config(logger: Logger, config: Dict[str, Any]) -> None:
                     f"Error: '{key}' cannot be negative, got {value} in config.json")
                 sys.exit(1)
 
-        elif key in ["emoji", "show_all", "no_gitignore", "no_files", "no_limit", "summary"]:
+        elif key in ["emoji", "show_all", "no_color", "no_gitignore", "no_files", "no_limit", "summary"]:
             if not isinstance(value, bool):
-                logger.log(Logger.ERROR, 
+                logger.log(Logger.ERROR,
                     f"Error: '{key}' must be boolean (true/false), got {type(value).__name__} in config.json")
                 sys.exit(1)
         else:

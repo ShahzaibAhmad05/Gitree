@@ -113,6 +113,12 @@ def parse_args() -> argparse.Namespace:
         help="Show emojis in tree output, default is false",
     )
     ap.add_argument(
+        "--no-color",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Disable colorized output",
+    )
+    ap.add_argument(
         "-s", "--summary",
         action="store_true",
         default=argparse.SUPPRESS,

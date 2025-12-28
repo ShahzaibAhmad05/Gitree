@@ -46,7 +46,7 @@ class TestListingFlags(unittest.TestCase):
         (self.root / "empty_folder").mkdir()
         (self.root / "folder").mkdir()
         (self.root / "folder" / "nested.txt").write_text('foo')
-        result = self._run_cli("--emoji")
+        result = self._run_cli("--emoji", "--no-color")
 
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertTrue(result.stdout.strip())
@@ -145,3 +145,24 @@ class TestListingFlags(unittest.TestCase):
             file_index < folder_index,
             msg=f"Expected file before folder. File at {file_index}, Folder at {folder_index}"
         )
+
+
+    def test_entry_point_no_color(self):
+        # Create additional structure
+        (self.root / "folder").mkdir()
+        (self.root / ".hidden_file").write_text("hidden")
+
+        # Test with color (default) - should contain ANSI color codes
+        result_with_color = self._run_cli("--hidden-items")
+
+        self.assertEqual(result_with_color.returncode, 0, msg=result_with_color.stderr)
+        self.assertTrue(result_with_color.stdout.strip())
+        # Check that ANSI escape sequences are present (color codes start with \x1b[)
+        self.assertIn("\x1b[", result_with_color.stdout, msg="Expected ANSI color codes in output")
+
+        # Test with --no-color flag - should NOT contain ANSI color codes
+        result_no_color = self._run_cli("--hidden-items", "--no-color")
+
+        self.assertEqual(result_no_color.returncode, 0, msg=result_no_color.stderr)
+        self.assertTrue(result_no_color.stdout.strip())
+        self.assertNotIn("\x1b[", result_no_color.stdout, msg="Expected no ANSI color codes with --no-color flag")
