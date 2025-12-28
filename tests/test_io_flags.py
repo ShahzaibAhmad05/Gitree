@@ -34,6 +34,7 @@ class TestIOFlags(unittest.TestCase):
             cwd=self.root,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
 

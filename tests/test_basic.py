@@ -32,6 +32,7 @@ class TestBasic(unittest.TestCase):
             cwd=cwd or self.root,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
 
