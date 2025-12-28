@@ -10,6 +10,7 @@ from .utilities.config import resolve_config
 from .utilities.logger import Logger, OutputBuffer
 from .services.basic_args_handling_service import handle_basic_cli_args, resolve_root_paths
 from .services.zipping_service import zip_roots
+from .services.interactive import get_interactive_file_selection
 from pathlib import Path
 
 
@@ -41,40 +42,26 @@ def main() -> None:
     # Fix any incorrect CLI args (paths missing extensions, etc.)
     args = correct_args(args)
     # This one bellow is also used for determining whether to draw tree or not
-    condition_for_no_output = args.copy or args.output or args.zip 
+    no_output_mode = args.copy or args.output or args.zip 
 
 
     # if some specific Basic CLI args given, execute and return
     # Handles for --version, --init-config, --config-user, --no-config
-    if handle_basic_cli_args(args): condition_for_no_output = True
+    if handle_basic_cli_args(args): no_output_mode = True
 
 
     # Validate and resolve all paths
     roots = resolve_root_paths(args, logger=logger)
+    selected_files_map = {}     # Map to keep track of selected files per root
 
-    # Interactive mode: select files for each root if requested
-    selected_files_map = {}
-    if args.interactive:
-        from .services.interactive import select_files
-        # We need to filter roots if user cancels selection or selects nothing?
-        # Current behavior in services: if not selected_files: continue.
-        # So we should probably keep that logic.
-        roots_to_keep = []
-        for root in roots:
-            selected = select_files(
-                root=root,
-                output_buffer=output_buffer,
-                logger=logger,
-                respect_gitignore=not args.no_gitignore,
-                gitignore_depth=args.gitignore_depth,
-                extra_excludes=args.exclude,
-                include_patterns=args.include,
-                include_file_types=args.include_file_types
-            )
-            if selected:
-                selected_files_map[root] = selected
-                roots_to_keep.append(root)
-        roots = roots_to_keep
+
+    if args.interactive:        # Get files map from interactive selection
+        selected_files_map = get_interactive_file_selection(roots=roots,    
+            output_buffer=output_buffer, logger=logger, args=args,
+        )
+        # Filter roots based on interactive selection
+        roots = list(selected_files_map.keys())
+
 
     # if zipping is requested
     if args.zip is not None:
@@ -85,14 +72,14 @@ def main() -> None:
         run_tree_mode(args, roots, output_buffer, logger, selected_files_map)
 
 
-    # print the output only if not copied to clipboard or zipped or output to file
-    if not condition_for_no_output:
+    # print the output only if not in no-output mode
+    if not no_output_mode:
         output_buffer.flush()
 
 
     # print the log if verbose mode
     if args.verbose:
-        if not condition_for_no_output: print()
+        if not no_output_mode: print()
         print("LOG:")
         logger.flush()
 
