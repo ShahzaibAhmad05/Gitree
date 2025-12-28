@@ -74,6 +74,12 @@ def parse_args() -> argparse.Namespace:
         help="Limit lines shown ",
     )
     ap.add_argument(
+        "--no-max-lines",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Disable max lines limit",
+    )
+    ap.add_argument(
         "--overrride-files",
         action="store_true",
         default=argparse.SUPPRESS,

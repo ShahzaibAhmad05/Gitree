@@ -49,6 +49,7 @@ def get_default_config() -> Dict[str, Any]:
         "no_gitignore": False,
         "no_files": False,
         "no_limit": False,
+        "no_max_lines": False,
         "no_contents": False,
         "override_files": True,
         "summary": False,

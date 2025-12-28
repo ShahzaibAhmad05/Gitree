@@ -261,6 +261,11 @@ def run_tree_mode(
                 output_buffer.write("")  # Empty line between trees
             output_buffer.write(str(root))
 
+        # Determine max_lines based on flags
+        max_lines = args.max_lines
+        if args.no_max_lines:
+            max_lines = None
+
         draw_tree(
             root=root,
             output_buffer=output_buffer,
@@ -271,7 +276,7 @@ def run_tree_mode(
             respect_gitignore=not args.no_gitignore,
             gitignore_depth=args.gitignore_depth,
             max_items=args.max_items,
-            max_lines=args.max_lines,
+            max_lines=max_lines,
             no_limit=args.no_limit,
             exclude_depth=args.exclude_depth,
             no_files=args.no_files,
@@ -333,7 +338,7 @@ def run_tree_mode(
             respect_gitignore=not args.no_gitignore,
             gitignore_depth=args.gitignore_depth,
             max_items=args.max_items,
-            max_lines=args.max_lines,
+            max_lines=max_lines,
             exclude_depth=args.exclude_depth,
             no_files=args.no_files,
             whitelist=selected_files,
