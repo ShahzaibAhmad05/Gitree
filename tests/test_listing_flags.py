@@ -110,22 +110,22 @@ class TestListingFlags(unittest.TestCase):
         self.assertIn(".hidden_file.txt", result_with_flag.stdout)
         self.assertIn(".hidden_dir", result_with_flag.stdout)
 
+
     def test_entry_point_files_first(self):
         # Create a folder and a file
-        (self.root / "aaaa_folder").mkdir()
-        (self.root / "zzzz_file.txt").write_text("data")
+        tmp_dir = "random_dir"
+        tmp_file = "random_file.txt"
+        (self.root / tmp_dir).mkdir()
+        (self.root / tmp_file).write_text("data")
 
         # Test with --files-first flag
         result_files_first = self._run_cli("--files-first")
 
-        # Add this print statement to see the actual tree structure in the logs
-        print(f"\nActual Output:\n{result_files_first.stdout}")
-
         self.assertEqual(result_files_first.returncode, 0, msg=result_files_first.stderr)
 
         files_first_output = result_files_first.stdout
-        file_index = files_first_output.find("zzzz_file.txt")
-        folder_index = files_first_output.find("aaaa_folder")
+        file_index = files_first_output.find(tmp_file)
+        folder_index = files_first_output.find(tmp_dir)
 
         self.assertTrue(
             file_index < folder_index,
