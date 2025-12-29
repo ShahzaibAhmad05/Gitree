@@ -29,7 +29,7 @@ class File(TreeItem):
         super().__init__(rel_path, depth, ignore, hidden)
 
         # Update name and extension in case of files (handles multiple dots)
-        self.name = os.path.splitext(rel_path).join('.')[:-1]
+        self.name = ".".join(os.path.splitext(rel_path)[:-1])
         self.ext = os.path.splitext(rel_path)[-1]
         self.add_contents = add_contents
 
