@@ -1,4 +1,4 @@
-from ..objects.tree_item import TreeItem, Folder, File
+from ..objects.tree_item import TreeItem, Folder, File, Truncated
 from ..constants.constant import (BRANCH, LAST, VERT, SPACE,
                                   EMPTY_DIR_EMOJI, NORMAL_DIR_EMOJI, 
                                   FILE_EMOJI,
@@ -28,6 +28,9 @@ class DrawingService:
         
         elif isinstance(item, File):
             return self._draw_file(item, is_last)
+        
+        elif isinstance(item, Truncated):
+            return self._draw_truncated(item)
         
         else:
             raise TypeError("Unsupported TreeItem type passed to draw method.")
@@ -70,6 +73,17 @@ class DrawingService:
         color = GREY if file.hidden and self.add_color else ""
 
         result = ((file.depth-1) * SPACE) + prefix + emoji + color + file.name + file.ext + RESET
+
+        return result
+    
+
+    def draw_truncated(self, truncated) -> str:
+        """
+        Draws a truncated note.
+        """
+        prefix = LAST       # Truncated items are the last ones by default
+        color = GREY        # Use grey color by default
+        result = (truncated.depth-1) * SPACE + prefix + color + truncated.name + RESET
 
         return result
     

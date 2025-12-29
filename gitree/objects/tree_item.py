@@ -49,3 +49,15 @@ class Folder(TreeItem):
     
     def add_child(self, child: TreeItem):
         self.children.append(child)
+
+
+class Truncated(TreeItem):
+    """
+    Represents a truncated list of items.
+    """
+
+    def __init__(self, items: list[TreeItem], rel_path, depth, ignore = False, hidden = False):
+        super().__init__(rel_path, depth, ignore, hidden)
+
+        self.items = items
+        self.name = f"... and {len(items)} more items"
