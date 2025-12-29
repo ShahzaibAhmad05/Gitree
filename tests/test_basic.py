@@ -10,6 +10,7 @@ class TestBasic(BaseCLISetup):
         self.assertTrue(result.stdout.strip())
         self.assertIn("file.txt", result.stdout)
 
+
     def test_entry_point_help(self):
         # For help/version, cwd doesn't matter much, but keeping it consistent is fine.
         result = self._run_cli("--help")
@@ -17,6 +18,7 @@ class TestBasic(BaseCLISetup):
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertTrue(result.stdout.strip())
         self.assertIn("--help", result.stdout)
+
 
     def test_entry_point_version(self):
         result = self._run_cli("--version")
