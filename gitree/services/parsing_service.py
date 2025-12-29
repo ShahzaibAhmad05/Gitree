@@ -71,7 +71,7 @@ def parse_args() -> argparse.Namespace:
         "--max-lines",
         type=max_lines_int,
         default=argparse.SUPPRESS,
-        help="Limit lines shown ",
+        help="Limit lines shown in the tree output",
     )
     ap.add_argument(
         "--overrride-files",
