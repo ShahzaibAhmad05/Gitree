@@ -64,12 +64,6 @@ def parse_args() -> argparse.Namespace:
         default=argparse.SUPPRESS,
         help="Limit lines shown in the tree output",
     )
-    ap.add_argument(
-        "--no-max-lines",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Disable max lines limit",
-    )
     basic.add_argument(
         "--config-user",
         action="store_true",
@@ -182,28 +176,10 @@ def parse_args() -> argparse.Namespace:
         help="Limit depth for .gitignore processing",
     )
     listing.add_argument(
-        "--no-gitignore",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Ignore .gitignore rules",
-    )
-    listing.add_argument(
         "--max-items",
         type=max_items_int,
         default=argparse.SUPPRESS,
         help="Limit items shown per directory (use --no-limit for unlimited)",
-    )
-    listing.add_argument(
-        "--no-limit",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Show all items regardless of count",
-    )
-    listing.add_argument(
-        "--no-files",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Hide files from the tree (only show directories)",
     )
     listing.add_argument(
         "-e", "--emoji",
@@ -240,6 +216,37 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         default=False,
         help="Print files before directories in the tree output",
+    )
+
+    # =========================
+    # LISTING CONTROL FLAGS
+    # =========================
+    listing_control = ap.add_argument_group("Listing control flags",
+        "Control flags to disable or negate listing behaviors")
+
+    listing_control.add_argument(
+        "--no-max-lines",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Disable max lines limit",
+    )
+    listing_control.add_argument(
+        "--no-gitignore",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Ignore .gitignore rules",
+    )
+    listing_control.add_argument(
+        "--no-limit",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Show all items regardless of count",
+    )
+    listing_control.add_argument(
+        "--no-files",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Hide files from the tree (only show directories)",
     )
 
     return ap.parse_args()
