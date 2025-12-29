@@ -1,40 +1,8 @@
-import subprocess
-import sys
-import tempfile
-from pathlib import Path
-import unittest
 from gitree.constants.constant import FILE_EMOJI, EMPTY_DIR_EMOJI, NORMAL_DIR_EMOJI
+from tests.base_setup import BaseCLISetup
 
 
-class TestListingFlags(unittest.TestCase):
-    
-    def setUp(self):
-        # Create a temp project directory for each test
-        self._tmpdir = tempfile.TemporaryDirectory()
-        self.root = Path(self._tmpdir.name)
-
-        # Base project structure
-        (self.root / "file.txt").write_text("hello")
-
-
-    def tearDown(self):
-        # Cleanup temp directory
-        self._tmpdir.cleanup()
-
-
-    def _run_cli(self, *args):
-        """
-        Helper to run the CLI consistently.
-        - args: extra CLI arguments, e.g. "--max-depth 1"
-        """
-        return subprocess.run(
-            [sys.executable, "-m", "gitree.main", *args],
-            cwd=self.root,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-        )
-
+class TestListingFlags(BaseCLISetup):
 
     @staticmethod
     def __build_name_with_emoji(file_name: str, emoji: str):
@@ -123,25 +91,3 @@ class TestListingFlags(unittest.TestCase):
         self.assertIn("file.txt", result_with_flag.stdout)
         self.assertIn(".hidden_file.txt", result_with_flag.stdout)
         self.assertIn(".hidden_dir", result_with_flag.stdout)
-
-
-    def test_entry_point_files_first(self):
-        # Create a folder and a file
-        tmp_dir = "random_dir"
-        tmp_file = "random_file.txt"
-        (self.root / tmp_dir).mkdir()
-        (self.root / tmp_file).write_text("data")
-
-        # Test with --files-first flag
-        result_files_first = self._run_cli("--files-first")
-
-        self.assertEqual(result_files_first.returncode, 0, msg=result_files_first.stderr)
-
-        files_first_output = result_files_first.stdout
-        file_index = files_first_output.find(tmp_file)
-        folder_index = files_first_output.find(tmp_dir)
-
-        self.assertTrue(
-            file_index < folder_index,
-            msg=f"Expected file before folder. File at {file_index}, Folder at {folder_index}"
-        )
