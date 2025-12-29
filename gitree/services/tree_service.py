@@ -338,7 +338,7 @@ def run_tree_mode(
             respect_gitignore=not args.no_gitignore,
             gitignore_depth=args.gitignore_depth,
             max_items=args.max_items,
-            max_lines=max_lines,
+            max_lines=args.max_lines,
             exclude_depth=args.exclude_depth,
             no_files=args.no_files,
             whitelist=selected_files,
