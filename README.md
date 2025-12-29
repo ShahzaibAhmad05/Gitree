@@ -259,7 +259,7 @@ In addition to the directory path, the following options are available:
 | `--gitignore-depth [n]` | Control discovery depth for `.gitignore` (e.g., `--gitignore-depth 0`). |
 | `--no-gitignore` | Ignore all `.gitignore` rules. |
 | `--max-items` | Limit items per directory (default: 20). |
-| `--max-lines` | Limit lines (default: 30). |
+| `--max-lines` | Limit lines (default: 40). |
 | `--no-limit` | Remove per-directory item limit. |
 | `--no-max-lines` | Disable total lines limit. |
 | `--no-files` | Show only directories (hide files). |

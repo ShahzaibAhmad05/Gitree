@@ -22,7 +22,7 @@ def get_default_config() -> Dict[str, Any]:
     """
     return {
         "max_items": 20,
-        "max_lines": 30,
+        "max_lines": 40,
         "max_depth": None,
         "gitignore_depth": None,
         "exclude_depth": None,
