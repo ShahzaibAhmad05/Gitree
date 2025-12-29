@@ -209,21 +209,36 @@ Pip will automatically replace the older version with the latest release.
 
 ## 🧪 Continuous Integration (CI)
 
-Gitree uses Continuous Integration (CI) to ensure code quality and prevent regressions on every change.
+Gitree uses Continuous Integration (CI) to ensure code quality and prevent breaking features on changes/refactoring.
+
 
 ### What CI Does
 - Runs automated checks on every pull request
 - Verifies that all CLI arguments work as expected
 - Ensures the tool behaves consistently across updates
 
+
 ### Current Test Coverage
 
 | Test Type | Description |
 |----------|-------------|
-| CLI Argument Tests | Validates all supported CLI flags and options |
-| Workflow Checks | Ensures PRs follow required checks before merging |
+| CLI Argument Tests | Currently validates most-used CLI flags and options |
+| Workflow Checks | Every Pull Request requires passing these checks before merging |
 
+> [!NOTE]
 > ℹ️ CI tests are continuously expanding as new features are added.
+
+
+### Implementation details
+The CI configuration is defined in `.github/workflows/`
+
+Each workflow file specifies:
+- Trigger conditions (i.e. pull request)
+- The Python version(s) used
+- The commands executed during the pipeline
+
+If any step fails, the pipeline will fail and the pull request cannot be merged until the issue is resolved.
+
 
 
 ## ⚙️ CLI Arguments
@@ -346,32 +361,3 @@ python -m unittest discover tests
 This is **YOUR** tool. Issues and pull requests are welcome.
 
 Gitree is kept intentionally small and readable, so contributions that preserve simplicity are especially appreciated.
-## 🔄 CI / CD Pipeline
-
-Gitree uses **GitHub Actions** to automatically verify code quality and stability.
-
-### When does it run?
-The CI pipeline runs on:
-- Every push to the repository
-- Every pull request
-
-### What does it do?
-The pipeline performs automated checks such as:
-- Setting up the Python environment
-- Installing project dependencies
-- Running linters to enforce code style
-- Executing tests to ensure existing functionality is not broken
-
-### Implementation details
-The CI configuration is defined in the following directory:
-.github/workflows/
-
-Each workflow file specifies:
-- Trigger conditions (push, pull request)
-- The Python version(s) used
-- The commands executed during the pipeline
-
-If any step fails, the pipeline will fail and the pull request cannot be merged until the issue is resolved.
-
-
-
