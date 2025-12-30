@@ -1,13 +1,14 @@
+import sys
 from pathlib import Path
 from typing import List, Optional, Set
 from ..utilities.gitignore import GitIgnoreMatcher
 from .list_enteries import list_entries
 from ..utilities.logger import Logger, OutputBuffer
 from ..utilities.utils import copy_to_clipboard
-from ..utilities.colors import colorize_text
 from ..constants.constant import (BRANCH, LAST, SPACE, VERT,
                                   FILE_EMOJI, EMPTY_DIR_EMOJI,
                                   NORMAL_DIR_EMOJI)
+from ..utilities.colors import colorize_text
 import pathspec
 from collections import defaultdict
 
@@ -65,8 +66,14 @@ def draw_tree(
     lines = 1
     truncation_prefix = None
 
+    # Track if any files matched include patterns for warning messages
+    files_matched_include_patterns = False
+    files_matched_include_types = False
+
     def rec(dirpath: Path, prefix: str, current_depth: int, patterns: List[str]) -> None:
+        nonlocal files_matched_include_patterns, files_matched_include_types
         nonlocal lines, truncation_prefix
+        
         if depth is not None and current_depth >= depth:
             return
 
@@ -103,6 +110,24 @@ def draw_tree(
             include_file_types=include_file_types,
             files_first=files_first,
         )
+
+        # Track if any files matched include patterns
+        if include_patterns:
+            include_spec_check = pathspec.PathSpec.from_lines("gitwildmatch", include_patterns)
+            for entry in entries:
+                if entry.is_file():
+                    rel_path = entry.relative_to(root).as_posix()
+                    if include_spec_check.match_file(rel_path):
+                        files_matched_include_patterns = True
+                        break
+
+        if include_file_types:
+            from ..utilities.utils import matches_file_type
+            for entry in entries:
+                if entry.is_file():
+                    if matches_file_type(entry, include_file_types):
+                        files_matched_include_types = True
+                        break
 
         filtered_entries = []
         for entry in entries:
@@ -176,6 +201,16 @@ def draw_tree(
     if root.is_dir():
         rec(root, "", 0, [])
 
+
+    # Print warnings to stderr if include patterns/types were specified but no files matched
+    if include_patterns and not files_matched_include_patterns:
+        patterns_str = ", ".join(include_patterns)
+        print(f"Warning: No files found matching --include patterns: {patterns_str}", file=sys.stderr)
+
+    if include_file_types and not files_matched_include_types:
+        types_str = ", ".join(include_file_types)
+        print(f"Warning: No files found matching --include-file-types: {types_str}", file=sys.stderr)
+        
     if truncation_prefix is not None:
         remaining = lines - max_lines
         output_buffer.write(truncation_prefix + LAST + f"... and {remaining} more lines")
