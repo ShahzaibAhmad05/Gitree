@@ -44,7 +44,7 @@ Install using pip (python package manager):
 # Install the latest version using pip
 pip install gitree    
 
-# Get the stable version instead (older, lacks features)
+# For older versions
 pip install gitree==0.1.3
 ```
 
