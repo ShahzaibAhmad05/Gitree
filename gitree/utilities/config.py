@@ -251,22 +251,26 @@ def merge_config_with_args(config: dict, args: argparse.Namespace) -> argparse.N
 
 def resolve_config(args: argparse.Namespace, logger: Logger) -> argparse.Namespace:
     """
-    Resolves the final configuration by merging user config with CLI args.
+    Resolves the final configuration by merging in the following order:
 
-    Args:
-        args: Parsed command-line arguments
-        logger: Logger instance for logging errors
+    1. Hardcoded defaults (always applied).
+    2. User config (only if --no-config is not set).
+    3. CLI args (highest precedence, overrides both defaults and user config).
 
-    Returns:
-        dict: Final configuration dictionary
+    This ensures that required attributes are always present and prevents
+    crashes when running with --no-config.
     """
-    # Load user configuration unless --no-config is specified
-    if not args.no_config:
-        config = load_user_config(logger=logger)
-        if not config:      # If the user has not setup a configuration file
-            config = get_default_config()
-            
-        # Merge config with args, precedence to CLI args
-        args = merge_config_with_args(config, args)
+    # Always start with hardcoded defaults
+    config = get_default_config()
+
+    # If config is allowed, merge user config on top of defaults
+    if not getattr(args, "no_config", False):
+        user_config = load_user_config(logger=logger)
+        if user_config:
+            config.update(user_config)
+
+    # Merge config/defaults with CLI args (CLI takes precedence)
+    args = merge_config_with_args(config, args)
 
     return args
+
