@@ -39,9 +39,13 @@ def resolve_root_paths(args: argparse.Namespace, logger: Logger) -> List[str]:
             # Regular path without wildcards
             path = Path(path_str).resolve()
             if not path.exists():
-                logger.log(Logger.ERROR, f"path not found: {path}", file=sys.stderr)
+
+                logger.log(Logger.ERROR, f"path not found: {path}")
+                print(f"ERROR: path not found {path}",file=sys.stderr)
+
                 # raise SystemExit(1) NOTE: quietly exit for now
-            roots.append(path)
+            else:
+                roots.append(path)
 
     return roots
 
