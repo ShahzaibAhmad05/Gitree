@@ -1,6 +1,21 @@
-# Gitree
+# gitree 🌴
 
 **A git-aware CLI tool to provide LLM context for coding projects by combining project files into a single file with a number of different formats to choose from.**
+
+<br>
+
+<div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/shahzaibahmad05/gitree?logo=github)](https://github.com/shahzaibahmad05/gitree/stargazers)
+[![PyPI](https://img.shields.io/pypi/v/gitree?logo=pypi&label=PyPI&color=blue)](https://pypi.org/project/gitree/)
+[![GitHub forks](https://img.shields.io/github/forks/shahzaibahmad05/gitree?color=blue)](https://github.com/shahzaibahmad05/gitree/network/members)
+[![Contributors](https://img.shields.io/github/contributors/shahzaibahmad05/gitree)](https://github.com/shahzaibahmad05/gitree/graphs/contributors)
+[![Issues closed](https://img.shields.io/github/issues-closed/shahzaibahmad05/gitree?color=orange)](https://github.com/shahzaibahmad05/gitree/issues)
+[![PRs closed](https://img.shields.io/github/issues-pr-closed/shahzaibahmad05/gitree?color=yellow)](https://github.com/shahzaibahmad05/gitree/pulls)
+
+</div>
+
+
 
 ## ✨ Features
 
@@ -23,11 +38,14 @@
 
 ## 📦 Installation
 
-Run this command in your terminal:
+Install using pip (python package manager):
 
 ```
-# Install using pip
-pip install gitree       
+# Install the latest version using pip
+pip install gitree    
+
+# Get the stable version instead (older, lacks features)
+pip install gitree==0.1.3
 ```
 
 ### 💡 Usage
@@ -175,21 +193,36 @@ Pip will automatically replace the older version with the latest release.
 
 ## 🧪 Continuous Integration (CI)
 
-Gitree uses Continuous Integration (CI) to ensure code quality and prevent regressions on every change.
+Gitree uses Continuous Integration (CI) to ensure code quality and prevent breaking features on changes/refactoring.
+
 
 ### What CI Does
 - Runs automated checks on every pull request
 - Verifies that all CLI arguments work as expected
 - Ensures the tool behaves consistently across updates
 
+
 ### Current Test Coverage
 
 | Test Type | Description |
 |----------|-------------|
-| CLI Argument Tests | Validates all supported CLI flags and options |
-| Workflow Checks | Ensures PRs follow required checks before merging |
+| CLI Argument Tests | Currently validates most-used CLI flags and options |
+| Workflow Checks | Every Pull Request requires passing these checks before merging |
 
+> [!NOTE]
 > ℹ️ CI tests are continuously expanding as new features are added.
+
+
+### Implementation details
+The CI configuration is defined in `.github/workflows/`
+
+Each workflow file specifies:
+- Trigger conditions (i.e. pull request)
+- The Python version(s) used
+- The commands executed during the pipeline
+
+If any step fails, the pipeline will fail and the pull request cannot be merged until the issue is resolved.
+
 
 
 ## ⚙️ CLI Arguments
@@ -227,6 +260,9 @@ In addition to the directory path, the following options are available:
 | `--no-gitignore` | Ignore all `.gitignore` rules. |
 | `--max-items` | Limit items per directory (default: 20). |
 | `--no-limit` | Remove per-directory item limit. |
+| `--max-lines` | Limit lines (default: 40). |
+| `--no-limit` | Remove per-directory item limit. |
+| `--no-max-lines` | Disable total lines limit. |
 | `--no-files` | Show only directories (hide files). |
 | `--emoji`, `-e` | Use emojis in output. |
 | `--summary` | Print file/folder counts per level. |

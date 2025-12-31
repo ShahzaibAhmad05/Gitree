@@ -1,4 +1,4 @@
-**This pull request completely/partially fixes issue #ISSUE_NUMBER**
+Fixes #ISSUE_NUMBER_HERE
 
 Additionally, at the time of submission of this PR:
 
