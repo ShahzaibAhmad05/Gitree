@@ -68,7 +68,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Ignore config.json and use hardcoded defaults",
     )
-    basic.add_argument(
+    ap.add_argument(
         "--verbose",
         action="store_true",
         default=argparse.SUPPRESS,
@@ -98,23 +98,6 @@ def parse_args() -> argparse.Namespace:
         help="Export tree as text to specified file",
     )
     io.add_argument(
-        "--md",
-        metavar="FILE",
-        default=argparse.SUPPRESS,
-        help="Export tree as Markdown to specified file",
-    )
-    io.add_argument(
-        "-o", "--output",
-        default=argparse.SUPPRESS,
-        help="Save tree structure to file",
-    )
-    io.add_argument(
-        "-c", "--copy",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Copy tree output to clipboard",
-    )
-    io.add_argument(
         "--no-contents",
         action="store_true",
         default=argparse.SUPPRESS,
@@ -133,6 +116,17 @@ def parse_args() -> argparse.Namespace:
         default=argparse.SUPPRESS,
         help="Override files even if they exist (for file outputs)",
     )
+    ap.add_argument(
+        "--md",
+        metavar="FILE",
+        default=argparse.SUPPRESS,
+        help="Export tree as Markdown to specified file",
+    )
+    ap.add_argument(
+        "-o", "--output",
+        default=argparse.SUPPRESS,
+        help="Save tree structure to file",
+    )
 
     # =========================
     # LISTING / TREE FLAGS
@@ -144,6 +138,12 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=argparse.SUPPRESS,
         help="Maximum depth to traverse",
+    )
+    ap.add_argument(
+        "--max-lines",
+        type=max_lines_int,
+        default=argparse.SUPPRESS,
+        help="Limit lines shown in the tree output",
     )
     listing.add_argument(
         "--hidden-items",
@@ -170,70 +170,47 @@ def parse_args() -> argparse.Namespace:
         help="Limit depth for .gitignore processing",
     )
     listing.add_argument(
-        "--no-gitignore",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Ignore .gitignore rules",
-    )
-    listing.add_argument(
         "--max-items",
         type=max_items_int,
         default=argparse.SUPPRESS,
         help="Limit items shown per directory (use --no-limit for unlimited)",
     )
-    listing.add_argument(
-        "--no-limit",
+    ap.add_argument(
+        "-c", "--copy",
         action="store_true",
         default=argparse.SUPPRESS,
-        help="Show all items regardless of count",
+        help="Copy tree output to clipboard",
     )
-    listing.add_argument(
-        "--max-lines",
-        type=max_lines_int,
-        default=argparse.SUPPRESS,
-        help="Limit lines shown in the tree output",
-    )
-    listing.add_argument(
-        "--no-max-lines",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Disable max lines limit",
-    )
-    listing.add_argument(
-        "--no-files",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Hide files from the tree (only show directories)",
-    )
-    listing.add_argument(
+    ap.add_argument(
         "-e", "--emoji",
         action="store_true",
         default=argparse.SUPPRESS,
-        help="Show emojis in tree output",
+        help="Show emojis in tree output, default is false",
+    )
+    ap.add_argument(
+        "-i", "--interactive",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Interactive mode: select files to include",
+    )
+    ap.add_argument(
+        "--include",
+        nargs="*",
+        default=argparse.SUPPRESS,
+        help="Patterns of files to include (e.g. *.py)",
+    )
+    ap.add_argument(
+        "--include-file-types", "--include-file-type",
+        nargs="*",
+        default=argparse.SUPPRESS,
+        dest="include_file_types",
+        help="Include files of multiple types, or a specific type (e.g. png jpg)",
     )
     listing.add_argument(
         "-s", "--summary",
         action="store_true",
         default=argparse.SUPPRESS,
         help="Print a summary of the number of files and folders at each level",
-    )
-    listing.add_argument(
-        "-i", "--interactive",
-        action="store_true",
-        default=argparse.SUPPRESS,
-        help="Interactive mode: select files to include",
-    )
-    listing.add_argument(
-        "--include",
-        nargs="*",
-        default=argparse.SUPPRESS,
-        help="Patterns of files to include (e.g. *.py)",
-    )
-    listing.add_argument(
-        "--include-file-type", "--include-file-types",
-        nargs="*",
-        default=argparse.SUPPRESS,
-        help="Include files of specific types (e.g. png jpg)",
     )
     listing.add_argument(
         "--files-first",
@@ -246,6 +223,37 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         default=argparse.SUPPRESS,
         help="Disable colorized output",
+    )
+
+    # =========================
+    # LISTING CONTROL FLAGS
+    # =========================
+    listing_control = ap.add_argument_group("Listing control flags",
+        "Control flags to disable or negate listing behaviors")
+
+    listing_control.add_argument(
+        "--no-max-lines",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Disable max lines limit",
+    )
+    listing_control.add_argument(
+        "--no-gitignore",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Ignore .gitignore rules",
+    )
+    listing_control.add_argument(
+        "--no-limit",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Show all items regardless of count",
+    )
+    listing_control.add_argument(
+        "--no-files",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="Hide files from the tree (only show directories)",
     )
 
     return ap.parse_args()

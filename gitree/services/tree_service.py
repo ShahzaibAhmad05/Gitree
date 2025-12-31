@@ -1,13 +1,14 @@
+import sys
 from pathlib import Path
 from typing import List, Optional, Set
 from ..utilities.gitignore import GitIgnoreMatcher
 from .list_enteries import list_entries
 from ..utilities.logger import Logger, OutputBuffer
 from ..utilities.utils import copy_to_clipboard
-from ..utilities.colors import colorize_text
 from ..constants.constant import (BRANCH, LAST, SPACE, VERT,
                                   FILE_EMOJI, EMPTY_DIR_EMOJI,
                                   NORMAL_DIR_EMOJI)
+from ..utilities.colors import colorize_text
 import pathspec
 from collections import defaultdict
 
@@ -63,14 +64,17 @@ def draw_tree(
 
     output_buffer.write(root.name)
     lines = 1
-    stop_writing = False
+    truncation_prefix = None
+
+    # Track if any files matched include patterns for warning messages
+    files_matched_include_patterns = False
+    files_matched_include_types = False
 
     def rec(dirpath: Path, prefix: str, current_depth: int, patterns: List[str]) -> None:
-        nonlocal lines, stop_writing
+        nonlocal files_matched_include_patterns, files_matched_include_types
+        nonlocal lines, truncation_prefix
+        
         if depth is not None and current_depth >= depth:
-            return
-
-        if stop_writing:
             return
 
         if respect_gitignore and gi.within_depth(dirpath):
@@ -107,6 +111,24 @@ def draw_tree(
             files_first=files_first,
         )
 
+        # Track if any files matched include patterns
+        if include_patterns:
+            include_spec_check = pathspec.PathSpec.from_lines("gitwildmatch", include_patterns)
+            for entry in entries:
+                if entry.is_file():
+                    rel_path = entry.relative_to(root).as_posix()
+                    if include_spec_check.match_file(rel_path):
+                        files_matched_include_patterns = True
+                        break
+
+        if include_file_types:
+            from ..utilities.utils import matches_file_type
+            for entry in entries:
+                if entry.is_file():
+                    if matches_file_type(entry, include_file_types):
+                        files_matched_include_types = True
+                        break
+
         filtered_entries = []
         for entry in entries:
             entry_path = str(entry.absolute())
@@ -127,14 +149,14 @@ def draw_tree(
 
 
         for i, entry in enumerate(entries):
-            if stop_writing:
-                return
-
             if max_lines is not None and lines >= max_lines:
-                remaining = len(entries) - i + truncated
-                output_buffer.write(prefix + LAST + f"... and more lines")
-                stop_writing = True
-                return
+                if truncation_prefix is None:
+                    truncation_prefix = prefix
+                
+                lines += 1
+                if entry.is_dir():
+                    rec(entry, prefix + SPACE, current_depth + 1, patterns)
+                continue
 
             is_last = i == len(entries) - 1 and truncated == 0
             connector = LAST if is_last else BRANCH
@@ -166,13 +188,32 @@ def draw_tree(
                 rec(entry, prefix + (SPACE if is_last else VERT),  current_depth + 1, patterns)
 
         # Show truncation message if items were hidden
-        if truncated > 0 and not stop_writing:
-            # truncation line is always last among displayed items
-            output_buffer.write(prefix + LAST + f"... and {truncated} more items")
-            lines += 1
+        if truncated > 0:
+            if max_lines is not None and lines >= max_lines:
+                if truncation_prefix is None:
+                    truncation_prefix = prefix
+                lines += 1
+            else:
+                # truncation line is always last among displayed items
+                output_buffer.write(prefix + LAST + f"... and {truncated} more items")
+                lines += 1
 
     if root.is_dir():
         rec(root, "", 0, [])
+
+
+    # Print warnings to stderr if include patterns/types were specified but no files matched
+    if include_patterns and not files_matched_include_patterns:
+        patterns_str = ", ".join(include_patterns)
+        print(f"Warning: No files found matching --include patterns: {patterns_str}", file=sys.stderr)
+
+    if include_file_types and not files_matched_include_types:
+        types_str = ", ".join(include_file_types)
+        print(f"Warning: No files found matching --include-file-types: {types_str}", file=sys.stderr)
+        
+    if truncation_prefix is not None:
+        remaining = lines - max_lines
+        output_buffer.write(truncation_prefix + LAST + f"... and {remaining} more lines")
 
 
 def print_summary(
