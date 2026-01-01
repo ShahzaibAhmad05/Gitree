@@ -17,6 +17,7 @@ def list_entries(
     show_all: bool,
     extra_excludes: List[str],
     max_items: Optional[int] = None,
+    max_lines: Optional[int] = None,
     no_limit: bool = False,
     exclude_depth: Optional[int] = None,
     no_files: bool = False,
@@ -37,6 +38,7 @@ def list_entries(
         show_all (bool): If True, include hidden files
         extra_excludes (List[str]): Additional exclude patterns
         max_items (Optional[int]): Maximum number of items to return
+        max_lines (Optional[int]): Maximum number of lines to return
         exclude_depth (Optional[int]): Depth limit for exclude patterns
         no_files (bool): If True, exclude files from results
         include_patterns (List[str]): Patterns for files to include
@@ -53,6 +55,30 @@ def list_entries(
         include_spec = pathspec.PathSpec.from_lines("gitwildmatch", include_patterns)
 
     for e in iter_dir(directory):
+        # Check for forced inclusion (overrides gitignore, hidden files, and other filters)
+        is_force_included = False
+        if include_spec or include_file_types:
+            if e.is_file():
+                if include_spec:
+                    rel_path = e.relative_to(root).as_posix()
+                    if include_spec.match_file(rel_path):
+                        is_force_included = True
+
+                if not is_force_included and include_file_types:
+                    if matches_file_type(e, include_file_types):
+                        is_force_included = True
+            elif e.is_dir():
+                if include_spec:
+                    rel_path = e.relative_to(root).as_posix()
+                    # Check if the directory itself matches the pattern
+                    if include_spec.match_file(rel_path):
+                        is_force_included = True
+
+        if is_force_included:
+            out.append(e)
+            continue
+
+        # Normal filters (hidden files check moved here, after force-include logic)
         if not show_all and e.name.startswith("."):
             continue
         if gi.is_ignored(e, spec):
@@ -63,33 +89,7 @@ def list_entries(
         if no_files and e.is_file():
             continue
 
-        # Apply inclusion filters (if any specified)
-        if include_spec or include_file_types:
-            # Directories always pass (needed for traversal)
-            if e.is_dir():
-                out.append(e)
-                continue
-
-            # Files must match at least one inclusion criterion
-            matches_include = False
-
-            # Check if matches include patterns
-            if include_spec:
-                rel_path = e.relative_to(root).as_posix()
-                if include_spec.match_file(rel_path):
-                    matches_include = True
-
-            # Check if matches file types
-            if not matches_include and include_file_types:
-                if matches_file_type(e, include_file_types):
-                    matches_include = True
-
-            # Only include if it matches at least one criterion
-            if matches_include:
-                out.append(e)
-        else:
-            # No inclusion filters, include everything
-            out.append(e)
+        out.append(e)
 
     if files_first:
         # Sort files first (is_file() is True/1, is_dir() is False/0)

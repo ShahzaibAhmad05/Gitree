@@ -4,33 +4,17 @@
 
 <br>
 
-<p align="center">
-  <a href="https://github.com/shahzaibahmad05/gitree/stargazers">
-    <img alt="GitHub stars" src="https://img.shields.io/github/stars/shahzaibahmad05/gitree?logo=github" />
-  </a>
-  
-  <a href="https://pypi.org/project/gitree/">
-    <img src="https://img.shields.io/pypi/v/gitree?style=flat&logo=pypi&label=PyPI&color=blue" />
-  </a>
+<div align="center">
 
-  <a href="https://github.com/shahzaibahmad05/gitree/network/members">
-    <img alt="GitHub forks" src="https://img.shields.io/github/forks/shahzaibahmad05/gitree?style=flat&color=blue" />
-  </a>
-    
-  <a href="https://github.com/shahzaibahmad05/gitree/graphs/contributors">
-    <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/shahzaibahmad05/gitree" />
-  </a>
+[![GitHub stars](https://img.shields.io/github/stars/shahzaibahmad05/gitree?logo=github)](https://github.com/shahzaibahmad05/gitree/stargazers)
+[![PyPI](https://img.shields.io/pypi/v/gitree?logo=pypi&label=PyPI&color=blue)](https://pypi.org/project/gitree/)
+[![GitHub forks](https://img.shields.io/github/forks/shahzaibahmad05/gitree?color=blue)](https://github.com/shahzaibahmad05/gitree/network/members)
+[![Contributors](https://img.shields.io/github/contributors/shahzaibahmad05/gitree)](https://github.com/shahzaibahmad05/gitree/graphs/contributors)
+[![Issues closed](https://img.shields.io/github/issues-closed/shahzaibahmad05/gitree?color=orange)](https://github.com/shahzaibahmad05/gitree/issues)
+[![PRs closed](https://img.shields.io/github/issues-pr-closed/shahzaibahmad05/gitree?color=yellow)](https://github.com/shahzaibahmad05/gitree/pulls)
 
-  <a href="https://github.com/shahzaibahmad05/gitree/issues">
-    <img alt="Issues Closed" src="https://img.shields.io/github/issues-closed/shahzaibahmad05/gitree?color=orange" />
-  </a>
+</div>
 
-  <a href="https://github.com/shahzaibahmad05/gitree/pulls">
-    <img alt="pull requests closed" src="https://img.shields.io/github/issues-pr-closed/shahzaibahmad05/gitree?color=yellow" />
-  </a>
-  <br />
-  <br />
-</p>
 
 ---
 
@@ -246,6 +230,7 @@ Gitree uses **Continuous Integration (CI)** to ensure code quality and prevent r
 * Verifies that all **CLI arguments** work as expected
 * Ensures the tool **behaves consistently** across updates
 
+
 ### Current Test Coverage
 
 | Test Type | Description |
@@ -257,6 +242,18 @@ Gitree uses **Continuous Integration (CI)** to ensure code quality and prevent r
 > CI tests are continuously expanding as new features are added.
 
 ---
+
+### Implementation details
+The CI configuration is defined in `.github/workflows/`
+
+Each workflow file specifies:
+- Trigger conditions (i.e. pull request)
+- The Python version(s) used
+- The commands executed during the pipeline
+
+If any step fails, the pipeline will fail and the pull request cannot be merged until the issue is resolved.
+
+
 
 ## ⚙️ CLI Arguments
 
@@ -275,14 +272,24 @@ In addition to the directory path, the following options are available:
 ### Input/Output flags
 
 | Argument | Description |
-| --- | --- |
-| `--zip [name]`, `-z` | **Zip** the project (respects `.gitignore`). Example: `--zip a` → `a.zip`. |
-| `--json [file]` | Export tree as **JSON** (includes file contents by default, up to 1MB/file). |
-| `--txt [file]` | Export tree as **text** (includes file contents by default, up to 1MB/file). |
-| `--md [file]` | Export tree as **Markdown** (includes contents with syntax highlighting). |
-| `--output [file]`, `-o` | Save **tree structure** to file (text or markdown). |
-| `--copy`, `-c` | Copy output to **clipboard**. |
-| `--no-contents` | Export **only** the tree structure (no file contents). |
+|----------|-------------|
+| `--max-depth` | Limit recursion depth (e.g., `--max-depth 1`). |
+| `--hidden-items` | Include hidden files and directories (does not override `.gitignore`). |
+| `--exclude [pattern]` | Exclude patterns (e.g., `--exclude *.pyc __pycache__`). |
+| `--exclude-depth [n]` | Limit depth for exclude patterns (e.g., `--exclude-depth 2`). |
+| `--gitignore-depth [n]` | Control discovery depth for `.gitignore` (e.g., `--gitignore-depth 0`). |
+| `--no-gitignore` | Ignore all `.gitignore` rules. |
+| `--max-items` | Limit items per directory (default: 20). |
+| `--no-limit` | Remove per-directory item limit. |
+| `--max-lines` | Limit lines (default: 40). |
+| `--no-limit` | Remove per-directory item limit. |
+| `--no-max-lines` | Disable total lines limit. |
+| `--no-files` | Show only directories (hide files). |
+| `--emoji`, `-e` | Use emojis in output. |
+| `--summary` | Print file/folder counts per level. |
+| `--include [pattern]` | Include patterns (often used with interactive mode). |
+| `--include-file-type` | Include a specific file type (e.g., `.py`, `json`). |
+| `--include-file-types` | Include multiple file types (e.g., `png jpg json`). |
 
 ### Listing flags
 
