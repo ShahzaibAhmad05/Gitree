@@ -1,3 +1,4 @@
+# gitree/services/interactive.py
 """
 Interactive file selection UI for gitree.
 

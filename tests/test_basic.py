@@ -1,3 +1,4 @@
+# tests/test_basic.py
 from tests.base_setup import BaseCLISetup
 
 
