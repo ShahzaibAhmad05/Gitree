@@ -73,13 +73,14 @@ def main() -> None:
 
 
     # print the output only if not in no-output mode
-    if not no_output_mode:
+    output_value_exists = not output_buffer.empty()
+    if not no_output_mode and output_value_exists:
         output_buffer.flush()
 
 
     # print the log if verbose mode
     if args.verbose:
-        if not no_output_mode: print()
+        if not no_output_mode and output_value_exists: print()
         print("LOG:")
         logger.flush()
 

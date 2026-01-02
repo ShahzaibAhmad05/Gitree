@@ -24,15 +24,17 @@ def resolve_root_paths(args: argparse.Namespace, logger: Logger) -> List[str]:
     roots = []
     
     for path_str in args.paths:
+
         # Check if path contains glob wildcards
         if '*' in path_str or '?' in path_str:
             # Expand glob pattern
             matches = glob.glob(path_str)
             if not matches:
-                logger.log(Logger.ERROR, f"no matches found for pattern: {path_str}")
+                logger.log(Logger.WARNING, f"no matches found for pattern: {path_str}")
                 # raise SystemExit(1) NOTE: quietly exit for now
             for match in matches:
                 roots.append(Path(match).resolve())
+
         else:
             # Regular path without wildcards
             path = Path(path_str).resolve()
