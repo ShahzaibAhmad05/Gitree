@@ -24,7 +24,7 @@ class TestIOFlags(BaseCLISetup):
     def test_entry_point_output(self):
         out_path = self.root / "tree_output.txt"
 
-        result = self._run_cli("--output", out_path.name)
+        result = self._run_cli("--export", out_path.name)
 
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertTrue(out_path.exists(), "Output file was not created")

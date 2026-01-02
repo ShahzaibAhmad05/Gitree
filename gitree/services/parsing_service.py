@@ -58,9 +58,10 @@ class ParsingService:
         """
         Correct and validate CLI arguments in place.
         """
-        if getattr(args, "output", None) is not None:
-            args.output = self._fix_output_path(
-                args.output,
+        # Change 'output' to 'export' here
+        if getattr(args, "export", None) is not None:
+            args.export = self._fix_output_path(
+                args.export,
                 default_extensions={"txt": ".txt", "json": ".json", "md": ".md"},
                 format_str=getattr(args, "format", "")
             )
@@ -106,7 +107,7 @@ class ParsingService:
             gitree . --exclude *.pyc __pycache__
                 Exclude compiled Python files
 
-            gitree --json tree.json --no-contents
+            gitree --export tree.json --no-contents
                 Export tree as JSON without file contents
 
             gitree --zip project.zip src/
@@ -143,7 +144,7 @@ class ParsingService:
             metavar="PATH", help="Exclude contents for specific files")
         io.add_argument("--overrride-files", action="store_true", 
             default=argparse.SUPPRESS, help="Override existing files")  # <-- triple r
-        io.add_argument("-o", "--output", 
+        io.add_argument("-o", "--export", 
             default=argparse.SUPPRESS, help="Save tree structure to file")
 
 

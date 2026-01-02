@@ -102,7 +102,7 @@ class Logger:
         return f"[{self._LEVEL_NAMES[level]}] {message}"
 
 
-class OutputBuffer(Logger):
+class ExportBuffer(Logger):
     """
     A custom output buffer to capture stdout writes. A wrapper around Logger.
     """

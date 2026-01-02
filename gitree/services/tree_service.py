@@ -4,13 +4,13 @@ from pathlib import Path
 from typing import List, Optional, Set
 from ..utilities.gitignore import GitIgnoreMatcher
 from .list_enteries import list_entries
-from ..utilities.logger import Logger, OutputBuffer
+from ..utilities.logger import Logger, ExportBuffer
 from ..utilities.utils import copy_to_clipboard
 from ..constants.constant import (BRANCH, LAST, SPACE, VERT,
                                   FILE_EMOJI, EMPTY_DIR_EMOJI,
                                   NORMAL_DIR_EMOJI)
 from ..utilities.colors import colorize_text
-from .tree_formatting_service import write_outputs, build_tree_data, format_markdown_tree, format_json, format_text_tree
+from .tree_formatting_service import write_exports, build_tree_data, format_markdown_tree, format_json, format_text_tree
 import pathspec
 from collections import defaultdict
 
@@ -18,7 +18,7 @@ from collections import defaultdict
 def draw_tree(
     *,
     root: Path,
-    output_buffer: OutputBuffer,
+    Export_buffer: ExportBuffer,
     logger: Logger,
     depth: Optional[int],
     show_all: bool,
@@ -42,7 +42,7 @@ def draw_tree(
 
     Args:
         root (Path): Root directory path to start the tree from
-        output_buffer (OutputBuffer): Buffer to write output to
+        Export_buffer (ExportBuffer): Buffer to write Export to
         logger (Logger): Logger instance for logging
         depth (Optional[int]): Maximum depth to traverse. None for unlimited
         show_all (bool): If True, include hidden files and directories
@@ -53,8 +53,8 @@ def draw_tree(
         max_lines (Optional[int]): Maximum number of lines to show
         exclude_depth (Optional[int]): Depth limit for exclude patterns
         no_files (bool): If True, only show directories
-        emoji (bool): If True, show emoji icons in output
-        no_color (bool): If True, disable colorized output
+        emoji (bool): If True, show emoji icons in Export
+        no_color (bool): If True, disable colorized Export
         whitelist (Optional[Set[str]]): Set of file paths to exclusively include
         include_patterns (List[str]): Patterns for files to include
         include_file_types (List[str]): File types (extensions) to include
@@ -64,7 +64,7 @@ def draw_tree(
     """
     gi = GitIgnoreMatcher(root, enabled=respect_gitignore, gitignore_depth=gitignore_depth)
 
-    output_buffer.write(root.name)
+    Export_buffer.write(root.name)
     lines = 1
     truncation_prefix = None
 
@@ -98,7 +98,7 @@ def draw_tree(
         entries, truncated = list_entries(
             dirpath,
             root=root,
-            output_buffer=output_buffer,
+            export_buffer=Export_buffer,
             logger=logger,
             gi=gi,
             spec=spec,
@@ -173,7 +173,7 @@ def draw_tree(
                 entry_name = colorize_text(entry_name, is_directory=entry.is_dir(), is_hidden=is_hidden)
 
             if not emoji:
-                output_buffer.write(prefix + connector + entry_name)
+                Export_buffer.write(prefix + connector + entry_name)
             else:
                 if entry.is_file():
                     emoji_str = FILE_EMOJI
@@ -182,7 +182,7 @@ def draw_tree(
                         emoji_str = EMPTY_DIR_EMOJI if (entry.is_dir() and not any(entry.iterdir())) else NORMAL_DIR_EMOJI
                     except PermissionError:
                         emoji_str = NORMAL_DIR_EMOJI
-                output_buffer.write(prefix + connector + emoji_str + " " + entry.name + suffix)
+                Export_buffer.write(prefix + connector + emoji_str + " " + entry.name + suffix)
             
             lines += 1
 
@@ -197,7 +197,7 @@ def draw_tree(
                 lines += 1
             else:
                 # truncation line is always last among displayed items
-                output_buffer.write(prefix + LAST + f"... and {truncated} more items")
+                Export_buffer.write(prefix + LAST + f"... and {truncated} more items")
                 lines += 1
 
     if root.is_dir():
@@ -215,13 +215,13 @@ def draw_tree(
         
     if truncation_prefix is not None:
         remaining = lines - max_lines
-        output_buffer.write(truncation_prefix + LAST + f"... and {remaining} more lines")
+        Export_buffer.write(truncation_prefix + LAST + f"... and {remaining} more lines")
 
 
 def print_summary(
     *,
     root: Path,
-    output_buffer: OutputBuffer,
+    Export_buffer: ExportBuffer,
     logger: Logger,
     respect_gitignore: bool = True,
     gitignore_depth: Optional[int] = None,
@@ -234,7 +234,7 @@ def print_summary(
 
     Args:
         root (Path): Root directory path to analyze
-        output_buffer (OutputBuffer): Buffer to write output to
+        Export_buffer (ExportBuffer): Buffer to write Export to
         logger (Logger): Logger instance for logging
         respect_gitignore (bool): If True, respect .gitignore rules. Defaults to True
         gitignore_depth (Optional[int]): Maximum depth to search for .gitignore files
@@ -289,15 +289,15 @@ def print_summary(
 
     count(root, 0, [])
 
-    output_buffer.write("\nDirectory Summary:")
+    Export_buffer.write("\nDirectory Summary:")
     for level in sorted(summary):
-        output_buffer.write(f"Level {level}: {summary[level]['dirs']} dirs, {summary[level]['files']} files")
+        Export_buffer.write(f"Level {level}: {summary[level]['dirs']} dirs, {summary[level]['files']} files")
 
 
 def run_tree_mode(
     args,
     roots: List[Path],
-    output_buffer,
+    Export_buffer,
     logger,
     selected_files_map: Optional[dict] = None
 ) -> None:
@@ -313,8 +313,8 @@ def run_tree_mode(
         # Add header for multiple paths
         if len(roots) > 1:
             if i > 0:
-                output_buffer.write("")  # Empty line between trees
-            output_buffer.write(str(root))
+                Export_buffer.write("")  # Empty line between trees
+            Export_buffer.write(str(root))
 
         # Determine max_lines based on flags
         max_lines = args.max_lines
@@ -323,7 +323,7 @@ def run_tree_mode(
 
         draw_tree(
             root=root,
-            output_buffer=output_buffer,
+            Export_buffer=Export_buffer,
             logger=logger,
             depth=args.max_depth,
             show_all=args.hidden_items,
@@ -346,7 +346,7 @@ def run_tree_mode(
         if args.summary:
             print_summary(
                 root=root,
-                output_buffer=output_buffer,
+                Export_buffer=Export_buffer,
                 logger=logger,
                 respect_gitignore=not args.no_gitignore,
                 gitignore_depth=args.gitignore_depth,
@@ -355,11 +355,11 @@ def run_tree_mode(
                 include_file_types=args.include_file_types,
             )
 
-    # Write to output file if requested
-    if args.output is not None:
+    # Write to Export file if requested
+    if args.export is not None:
         # If format is tree, write whatever was drawn to the buffer.
         if args.format == "tree":
-            content = output_buffer.get_value()
+            content = Export_buffer.get_value()
 
         else:
             # For json/md we must build structured tree data (not the unicode rendering)
@@ -368,7 +368,7 @@ def run_tree_mode(
             # NOTE: keeps previous behavior: export uses last processed root
             tree_data = build_tree_data(
                 root=root,
-                output_buffer=output_buffer,
+                export_buffer=Export_buffer,
                 logger=logger,
                 depth=args.max_depth,
                 show_all=args.hidden_items,
@@ -395,21 +395,21 @@ def run_tree_mode(
                     content = format_json(tree_data)
             else:
                 # fallback safety
-                content = output_buffer.get_value()
+                content = Export_buffer.get_value()
 
-        with open(args.output, "w", encoding="utf-8") as f:
+        with open(args.export, "w", encoding="utf-8") as f:
             f.write(content)
 
 
     if args.copy:
-        # Copy the formatted output, not always the unicode tree
-        content_to_copy = output_buffer.get_value()
+        # Copy the formatted Export, not always the unicode tree
+        content_to_copy = Export_buffer.get_value()
         if args.format in ("json", "md"):
 
             include_contents = not args.no_contents
             tree_data = build_tree_data(
                 root=root,
-                output_buffer=output_buffer,
+                Export_buffer=Export_buffer,
                 logger=logger,
                 depth=args.max_depth,
                 show_all=args.hidden_items,
@@ -434,11 +434,11 @@ def run_tree_mode(
 
 
         if not copy_to_clipboard(content_to_copy, logger=logger):
-            output_buffer.write(
+            Export_buffer.write(
                 "Warning: Could not copy to clipboard. "
                 "Please install a clipboard utility (xclip, wl-copy) "
                 "or ensure your environment supports it."
             )
         else:
-            output_buffer.clear()
-            logger.log(logger.INFO, "Tree output copied to clipboard successfully.")
+            Export_buffer.clear()
+            logger.log(logger.INFO, "Tree Export copied to clipboard successfully.")

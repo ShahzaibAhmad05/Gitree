@@ -7,7 +7,7 @@ if sys.platform.startswith('win'):      # fix windows unicode error on CI
 from .services.tree_service import run_tree_mode
 from .services.parsing_service import ParsingService
 from .utilities.config import resolve_config
-from .utilities.logger import Logger, OutputBuffer
+from .utilities.logger import Logger, ExportBuffer
 from .services.basic_args_handling_service import handle_basic_cli_args, resolve_root_paths
 from .services.zipping_service import zip_roots
 from .services.interactive import get_interactive_file_selection
@@ -27,7 +27,7 @@ def main() -> None:
         - Use services/ and utilities/ modules for logic, and import their functions here
     """
     logger = Logger()
-    output_buffer = OutputBuffer()
+    export_buffer = ExportBuffer()
 
 
     # Get the CLI args
@@ -42,12 +42,12 @@ def main() -> None:
 
 
     # This one bellow is also used for determining whether to draw tree or not
-    no_output_mode = args.copy or args.output or args.zip 
+    no_export_mode = args.copy or args.export or args.zip 
 
 
     # if some specific Basic CLI args given, execute and return
     # Handles for --version, --init-config, --config-user, --no-config
-    if handle_basic_cli_args(args, logger): no_output_mode = True
+    if handle_basic_cli_args(args, logger): no_export_mode = True
 
 
     # Validate and resolve all paths
@@ -57,7 +57,7 @@ def main() -> None:
 
     if args.interactive:        # Get files map from interactive selection
         selected_files_map = get_interactive_file_selection(roots=roots,    
-            output_buffer=output_buffer, logger=logger, args=args,
+            export_buffer=export_buffer, logger=logger, args=args,
         )
         # Filter roots based on interactive selection
         roots = list(selected_files_map.keys())
@@ -65,22 +65,22 @@ def main() -> None:
 
     # if zipping is requested
     if args.zip is not None:
-        zip_roots(args, roots, output_buffer, logger, selected_files_map)
+        zip_roots(args, roots, export_buffer, logger, selected_files_map)
 
     # else, print the tree normally
     else:       
-        run_tree_mode(args, roots, output_buffer, logger, selected_files_map)
+        run_tree_mode(args, roots, export_buffer, logger, selected_files_map)
 
 
-    # print the output only if not in no-output mode
-    output_value_exists = not output_buffer.empty()
-    if not no_output_mode and output_value_exists:
-        output_buffer.flush()
+    # print the export only if not in no-export mode
+    export_value_exists = not export_buffer.empty()
+    if not no_export_mode and export_value_exists:
+        export_buffer.flush()
 
 
     # print the log if verbose mode
     if args.verbose:
-        if not no_output_mode and output_value_exists: print()
+        if not no_export_mode and export_value_exists: print()
         print("LOG:")
         logger.flush()
 
