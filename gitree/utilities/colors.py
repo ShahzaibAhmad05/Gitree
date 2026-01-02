@@ -1,3 +1,4 @@
+# gitree/utilities/colors.py
 """
 Color utility for terminal output using colorama.
 
