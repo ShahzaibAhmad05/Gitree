@@ -3,13 +3,10 @@ from ..utilities.logger import Logger, OutputBuffer
 import argparse, glob, sys
 from pathlib import Path
 from typing import List
+from gitree import get_project_version
 
 
-def get_project_version() -> str:
-    """
-    Returns the current version of the project
-    """
-    return "0.0.0 (dev)"
+
 
 
 def resolve_root_paths(args: argparse.Namespace, logger: Logger) -> List[str]:
