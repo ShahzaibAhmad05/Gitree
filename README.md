@@ -15,6 +15,11 @@
 
 </div>
 
+## 🎬 Demo
+
+<div align="center">
+  <img src="assets/gitree-demo.gif" alt="gitree CLI demo showing project tree visualization" />
+</div>
 
 ---
 
