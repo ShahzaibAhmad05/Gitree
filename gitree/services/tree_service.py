@@ -95,7 +95,7 @@ def draw_tree(
 
         spec = pathspec.PathSpec.from_lines("gitwildmatch", patterns)
 
-        entries, truncated = list_entries(
+        entry_list, truncated = list_entries(
             dirpath,
             root=root,
             output_buffer=output_buffer,
@@ -116,7 +116,7 @@ def draw_tree(
         # Track if any files matched include patterns
         if include_patterns:
             include_spec_check = pathspec.PathSpec.from_lines("gitwildmatch", include_patterns)
-            for entry in entries:
+            for entry in entry_list:
                 if entry.is_file():
                     rel_path = entry.relative_to(root).as_posix()
                     if include_spec_check.match_file(rel_path):
@@ -125,14 +125,14 @@ def draw_tree(
 
         if include_file_types:
             from ..utilities.utils import matches_file_type
-            for entry in entries:
+            for entry in entry_list:
                 if entry.is_file():
                     if matches_file_type(entry, include_file_types):
                         files_matched_include_types = True
                         break
 
         filtered_entries = []
-        for entry in entries:
+        for entry in entry_list:
             entry_path = str(entry.absolute())
             if whitelist is not None:
                 # If it's a file, it must be in the whitelist
@@ -146,12 +146,12 @@ def draw_tree(
                        continue
             filtered_entries.append(entry)
 
-        entries = filtered_entries
+        entry_list = filtered_entries
 
 
 
-        for i, entry in enumerate(entries):
-            if max_entries is not None and lines >= max_entries:
+        for i, entry in enumerate(entry_list):
+            if max_entries is not None and entries >= max_entries:
                 if truncation_prefix is None:
                     truncation_prefix = prefix
                 
@@ -160,7 +160,7 @@ def draw_tree(
                     rec(entry, prefix + SPACE, current_depth + 1, patterns)
                 continue
 
-            is_last = i == len(entries) - 1 and truncated == 0
+            is_last = i == len(entry_list) - 1 and truncated == 0
             connector = LAST if is_last else BRANCH
             suffix = "/" if entry.is_dir() else ""
 
@@ -191,7 +191,7 @@ def draw_tree(
 
         # Show truncation message if items were hidden
         if truncated > 0:
-            if max_entries is not None and lines >= max_entries:
+            if max_entries is not None and entries >= max_entries:
                 if truncation_prefix is None:
                     truncation_prefix = prefix
                 entries += 1
@@ -255,7 +255,7 @@ def run_tree_mode(
             respect_gitignore=not args.no_gitignore,
             gitignore_depth=args.gitignore_depth,
             max_items=args.max_items,
-            max_lines=max_entries,
+            max_entries=max_entries,
             no_limit=args.no_limit,
             exclude_depth=args.exclude_depth,
             no_files=args.no_files,

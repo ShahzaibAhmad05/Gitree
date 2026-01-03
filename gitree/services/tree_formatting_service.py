@@ -85,7 +85,7 @@ def build_tree_data(
         spec = pathspec.PathSpec.from_lines("gitwildmatch", patterns)
 
         # Get entries
-        entries, truncated = list_entries(
+        entry_list, truncated = list_entries(
             dirpath,
             root=root,
             output_buffer=output_buffer,
@@ -104,7 +104,7 @@ def build_tree_data(
 
         # Filter by whitelist
         filtered_entries = []
-        for entry in entries:
+        for entry in entry_list:
             entry_path = str(entry.absolute())
             if whitelist is not None:
                 if entry.is_file():
@@ -115,16 +115,16 @@ def build_tree_data(
                         continue
             filtered_entries.append(entry)
 
-        entries = filtered_entries
+        entry_list = filtered_entries
 
         # Build children list
         children = []
-        for i, entry in enumerate(entries):
+        for i, entry in enumerate(entry_list):
             if stop_writing:
                 break
 
-            if max_entries is not None and lines >= max_entries:
-                remaining = len(entries) - i + truncated
+            if max_entries is not None and entries >= max_entries:
+                remaining = len(entry_list) - i + truncated
                 children.append({"name": "... and more entries", "type": "truncated"})
                 stop_writing = True
                 break
@@ -141,7 +141,7 @@ def build_tree_data(
                     file_node["contents"] = read_file_contents(entry)
 
                 children.append(file_node)
-                lines += 1
+                entries += 1
 
             elif entry.is_dir():
                 entries += 1
