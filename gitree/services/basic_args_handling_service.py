@@ -46,7 +46,7 @@ def resolve_root_paths(args: argparse.Namespace, logger: Logger) -> List[Path]:
                 print(f"ERROR: path not found {p}", file=sys.stderr)
                 continue
             add_root(p)
-
+    print(roots)
     return roots
 
 

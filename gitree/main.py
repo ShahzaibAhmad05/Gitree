@@ -68,7 +68,8 @@ def main() -> None:
         zip_roots(args, roots, export_buffer, logger, selected_files_map)
 
     # else, print the tree normally
-    else:       
+    else:    
+ 
         run_tree_mode(args, roots, export_buffer, logger, selected_files_map)
 
 
